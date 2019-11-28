@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [ "@babel/preset-env", {
+      "targets": {
+        "node": "8.11"
+      },
+      "useBuiltIns": "usage"
+    }],
+    "@ava/stage-4",
+    "@ava/transform-test-files",
+    "@babel/flow"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-object-rest-spread"
+  ]
+}
