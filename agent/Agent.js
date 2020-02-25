@@ -25,11 +25,12 @@ const makeHslIdRequest = async options => {
 };
 
 const getDataStorage = async id => {
+  const managementClientId = (0, _helpers.getManagementClientId)();
   const options = {
     method: 'GET',
     endpoint: '/api/rest/v1/datastorage',
     params: {
-      dsfilter: `ownerId eq "${id}" and name eq "favorites"`
+      dsfilter: `ownerId eq "${id}" and name eq "favorites-${managementClientId || ''}"`
     }
   };
   const response = await makeHslIdRequest(options);
@@ -50,12 +51,12 @@ const createDataStorage = async id => {
     method: 'POST',
     endpoint: `/api/rest/v1/datastorage`,
     data: {
-      name: 'favorites',
+      name: `favorites-${managementClientId || ''}`,
       description: 'Suosikit',
       ownerId: id,
       adminAccess: [managementClientId],
-      readAccess: [managementClientId],
-      writeAccess: [managementClientId]
+      readAccess: [managementClientId, id],
+      writeAccess: [managementClientId, id]
     }
   };
   const response = await makeHslIdRequest(options);
