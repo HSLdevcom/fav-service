@@ -37,7 +37,12 @@ const getDataStorage = async id => {
 
   try {
     const dataStorage = response.data.resources[0];
-    return dataStorage;
+
+    if (dataStorage) {
+      return dataStorage;
+    } else {
+      throw new _Err.default(404, 'DataStorage not found');
+    }
   } catch (error) {
     throw new _Err.default(404, 'DataStorage not found');
   }

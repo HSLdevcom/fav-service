@@ -31,7 +31,11 @@ export const getDataStorage = async(id: string) => {
   const response = await makeHslIdRequest(options)
   try {
     const dataStorage = response.data.resources[0]
-    return dataStorage
+    if (dataStorage) {
+      return dataStorage
+    } else {
+      throw new Err(404, 'DataStorage not found')
+    }
   } catch(error) {
     throw new Err(404, 'DataStorage not found')
   }
