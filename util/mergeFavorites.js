@@ -8,7 +8,7 @@ exports.default = mergeFavorites;
 function mergeFavorites(currentFavorites, newFavorites) {
   const newData = {};
   newFavorites.forEach(favorite => {
-    newData[favorite.id] = favorite;
+    newData[favorite.favouriteId] = favorite;
   });
   return Object.assign(currentFavorites, newData);
 }

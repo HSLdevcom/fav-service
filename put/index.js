@@ -26,86 +26,43 @@ const updateSchema = {
       items: {
         type: 'object',
         properties: {
-          id: {
-            type: 'string'
-          },
-          name: {
+          favouriteId: {
             type: 'string'
           },
           type: {
             type: 'string'
           },
-          iconName: {
+          lastUpdated: {
+            type: 'number'
+          },
+          gtfsId: {
             type: 'string'
           },
-          isStation: {
-            type: 'boolean'
+          gid: {
+            type: 'string'
           },
-          status: {
+          name: {
             type: 'string'
           },
           address: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string'
-              },
-              desc: {
-                type: 'string'
-              },
-              housenumber: {
-                type: 'string'
-              },
-              street: {
-                type: 'string'
-              },
-              postalcode: {
-                type: ['string', 'null']
-              },
-              region: {
-                type: ['string', 'null']
-              },
-              locality: {
-                type: ['string', 'null']
-              },
-              neighbourhood: {
-                type: ['string', 'null']
-              },
-              label: {
-                type: 'string'
-              },
-              lat: {
-                type: ['number', 'null']
-              },
-              lon: {
-                type: ['number', 'null']
-              },
-              code: {
-                type: ['string', 'null']
-              },
-              platformCode: {
-                type: 'string'
-              },
-              nextDeparture: {
-                type: 'string'
-              },
-              gtfsId: {
-                type: 'string'
-              },
-              coordinates: {
-                type: 'array',
-                items: {
-                  type: 'number'
-                }
-              }
-            },
-            required: ['name'],
-            additionalProperties: false
+            type: 'string'
+          },
+          lat: {
+            type: 'number'
+          },
+          lon: {
+            type: 'number'
+          },
+          selectedIconId: {
+            type: 'string'
+          },
+          layer: {
+            type: 'string'
           }
-        },
-        required: ['id', 'type', 'address'],
-        additionalProperties: false
-      }
+        }
+      },
+      required: ['favouriteId', 'type', 'lastUpdated'],
+      additionalProperties: false
     },
     params: {
       type: 'object',

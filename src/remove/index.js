@@ -35,7 +35,7 @@ const deleteSchema = {
   required: ['params', 'method', 'body'],
 }
 
-export default async function(context: AzureContext, req: Request) {
+export default async function (context: AzureContext, req: Request) {
   try {
     const settings = {}
     settings.redisHost = getRedisHost()
@@ -62,13 +62,13 @@ export default async function(context: AzureContext, req: Request) {
     const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
     const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
     const waitForRedis = (client) => new Promise((resolve, reject) => {
-      client.on('ready', async() => {
+      client.on('ready', async () => {
         context.log('redis connected')
         await client.expire(req.params.id, 0)
         client.quit()
         resolve()
       })
-      client.on('error', async() => {
+      client.on('error', async () => {
         context.log('redis error')
         client.quit()
         reject()
@@ -80,7 +80,7 @@ export default async function(context: AzureContext, req: Request) {
       status: 200,
       body: JSON.stringify(success),
     }
-  } catch(err) {
+  } catch (err) {
     context.res = createErrorResponse(err, context.log)
   }
 }
