@@ -5,10 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = mergeFavorites;
 
-function mergeFavorites(currentFavorites, newFavorites) {
+function mergeFavorites(currentFavorites, newFavorites, store) {
   const newData = {};
   newFavorites.forEach(favorite => {
-    newData[favorite.favouriteId] = favorite;
+    newData[`${store}-${favorite.favouriteId}`] = favorite;
   });
   return Object.assign(currentFavorites, newData);
 }

@@ -47,6 +47,13 @@ const updateSchema = {
       required: ['id'],
       additionalProperties: false,
     },
+    query: {
+      type: 'object',
+      properties: {
+        store: {type: 'string'},
+      },
+      required: ['store'],
+    },
     method: {
       type: 'string',
       pattern: 'PUT',
@@ -92,8 +99,9 @@ export default async function (context: AzureContext, req: Request) {
       }
     }
     context.log('using dataStorage with id ' + dataStorage.id)
+    const key = `${req.query.store}-${req.params.id}`
     const currentFavorites: Object = await getFavorites(dataStorage.id)
-    const mergedFavorites = mergeFavorites(currentFavorites, req.body)
+    const mergedFavorites = mergeFavorites(currentFavorites, req.body, req.query.store)
     const response = await updateFavorites(dataStorage.id, mergedFavorites)
     cache.data = mergedFavorites
     // update data to redis with hslid key
@@ -102,7 +110,7 @@ export default async function (context: AzureContext, req: Request) {
     const waitForRedis = (client) => new Promise((resolve, reject) => {
       client.on('ready', async () => {
         context.log('redis connected')
-        await client.set(req.params.id, JSON.stringify(cache.data))
+        await client.set(key, JSON.stringify(cache.data))
         await client.quit()
         resolve()
       })

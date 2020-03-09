@@ -38,6 +38,15 @@ const deleteSchema = {
     method: {
       type: 'string',
       pattern: 'DELETE'
+    },
+    query: {
+      type: 'object',
+      properties: {
+        store: {
+          type: 'string'
+        }
+      },
+      required: ['store']
     }
   },
   required: ['params', 'method', 'body']
@@ -51,11 +60,12 @@ async function _default(context, req) {
     settings.redisPass = (0, _helpers.getRedisPass)();
     (0, _validator.default)(deleteSchema, req);
     context.log(req);
+    const key = `${req.query.store}-${req.params.id}`;
     context.log('getting dataStorage');
     const dataStorage = await (0, _Agent.getDataStorage)(req.params.id);
     context.log(`got dataStorage with id ${dataStorage.id}`);
     context.log('deleting items');
-    const responses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body);
+    const responses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, req.query.store);
     context.log('deleted items');
     const success = req.body.map((key, i) => {
       return {
@@ -77,7 +87,7 @@ async function _default(context, req) {
     const waitForRedis = client => new Promise((resolve, reject) => {
       client.on('ready', async () => {
         context.log('redis connected');
-        await client.expire(req.params.id, 0);
+        await client.expire(key, 0);
         client.quit();
         resolve();
       });

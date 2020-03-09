@@ -23,6 +23,13 @@ const getSchema = {
       required: ['id'],
       additionalProperties: false,
     },
+    query: {
+      type: 'object',
+      properties: {
+        store: {type: 'string'},
+      },
+      required: ['store'],
+    },
     method: {
       type: 'string',
       pattern: 'GET',
@@ -57,10 +64,11 @@ export default async function (context: AzureContext, req: Request) {
   }
   const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
   const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
+  const key = `${req.query.store}-${req.params.id}`
   const waitForRedis = (client) => new Promise((resolve, reject) => {
     client.on('ready', async() => {
       context.log('redis connected')
-      const data = await client.get(req.params.id)
+      const data = await client.get(key)
       context.log(data)
       cache.data = JSON.parse(data)
       resolve()
@@ -84,7 +92,7 @@ export default async function (context: AzureContext, req: Request) {
       const filteredFavorites = filterFavorites(favorites)
       // cache data
       context.log('caching data')
-      await client.set(req.params.id, JSON.stringify(favorites))
+      await client.set(key, JSON.stringify(favorites))
       context.res = {
         status: 200,
         body: filteredFavorites,

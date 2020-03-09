@@ -82,14 +82,14 @@ export const updateFavorites = async(dsId: string, favorites: Object) => {
   return response
 }
 
-export const deleteFavorites = async(dsId: string, keys: Array<string>) => {
+export const deleteFavorites = async(dsId: string, keys: Array<string>, store: string) => {
   const responses = []
   for (let i = 0; i < keys.length; i++) {
     try {
       const key = keys[i]
       const options = {
         method: 'DELETE',
-        endpoint: `/api/rest/v1/datastorage/${dsId}/data/${key}`,
+        endpoint: `/api/rest/v1/datastorage/${dsId}/data/${store}-${key}`,
       }
       responses.push(await makeHslIdRequest(options))
     } catch(err) {
