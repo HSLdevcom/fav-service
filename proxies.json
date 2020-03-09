@@ -6,21 +6,21 @@
         "methods": ["GET"],
         "route": "api/favorites/{id}"
       },
-      "backendUri": "https://%FAVORITES_HOST%/api/get"
+      "backendUri": "https://%FAVORITES_HOST%/api/get?store=fav"
     },
     "Update": {
       "matchCondition": {
         "methods": ["PUT"],
         "route": "api/favorites/{id}"
       },
-      "backendUri": "https://%FAVORITES_HOST%/api/put"
+      "backendUri": "https://%FAVORITES_HOST%/api/put?store=fav"
     },
     "Delete": {
       "matchCondition": {
         "methods": ["DELETE"],
         "route": "api/favorites/{id}"
       },
-      "backendUri": "https://%FAVORITES_HOST%/api/remove"
+      "backendUri": "https://%FAVORITES_HOST%/api/remove?store=fav"
     }
   }
 }
