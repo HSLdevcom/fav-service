@@ -3,14 +3,17 @@
 export default function mergeFavorites(currentFavorites: Object, newFavorites: Array<Object>, store: string) {
   const newData = {}
   const currentData = Object.values(currentFavorites).filter((elem) => elem)
-  const favouriteIds = currentData.map((elem) => elem.favouriteId)
-  const gtfsIds = currentData.map((elem) => elem.gtfsId)
-  const gids = currentData.map((elem) => elem.gid)
   newFavorites.forEach((favorite) => {
-    // Update existing favourite
-    if (favouriteIds.includes(favorite.favouriteId)) {
-      currentFavorites[`${store}-${favorite.favouriteId}`] = favorite
-    } else if (!gtfsIds.includes(favorite.gtfsId) && !gids.includes(favorite.gid)) {
+    let duplicateId;
+    const isDuplicate = currentData.some((item) => {
+      if (item.favoriteId !== favorite.favouriteId && (item.gtfsId === favorite.gtfsId || (item.gid && item.gid === favorite.gid))) {
+        duplicateId = item.favouriteId
+        return true
+      }
+    })
+    if (isDuplicate) {
+      newData[`${store}-${duplicateId}`] = {...favorite, favouriteId: duplicateId}
+    } else {
       newData[`${store}-${favorite.favouriteId}`] = favorite
     }
   })
