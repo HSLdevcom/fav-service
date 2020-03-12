@@ -17,7 +17,7 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
   newFavorites.forEach(favorite => {
     let duplicateId;
     const isDuplicate = currentData.some(item => {
-      if (item.favoriteId !== favorite.favouriteId && (item.gtfsId === favorite.gtfsId || item.gid && item.gid === favorite.gid)) {
+      if (item.favoriteId !== favorite.favouriteId && (item.gtfsId && item.gtfsId === favorite.gtfsId || item.gid && item.gid === favorite.gid)) {
         duplicateId = item.favouriteId;
         return true;
       }
