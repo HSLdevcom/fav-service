@@ -101,7 +101,7 @@ export default async function (context: AzureContext, req: Request) {
     context.log('using dataStorage with id ' + dataStorage.id)
     const key = `${req.query.store}-${req.params.id}`
     const currentFavorites: Object = await getFavorites(dataStorage.id)
-    const mergedFavorites = mergeFavorites(currentFavorites, req.body, req.query.store)
+    const mergedFavorites = await mergeFavorites(currentFavorites, req.body, req.query.store)
     const response = await updateFavorites(dataStorage.id, mergedFavorites)
     cache.data = mergedFavorites
     // update data to redis with hslid key

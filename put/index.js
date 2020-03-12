@@ -135,7 +135,7 @@ async function _default(context, req) {
     context.log('using dataStorage with id ' + dataStorage.id);
     const key = `${req.query.store}-${req.params.id}`;
     const currentFavorites = await (0, _Agent.getFavorites)(dataStorage.id);
-    const mergedFavorites = (0, _mergeFavorites.default)(currentFavorites, req.body, req.query.store);
+    const mergedFavorites = await (0, _mergeFavorites.default)(currentFavorites, req.body, req.query.store);
     const response = await (0, _Agent.updateFavorites)(dataStorage.id, mergedFavorites);
     cache.data = mergedFavorites; // update data to redis with hslid key
 
