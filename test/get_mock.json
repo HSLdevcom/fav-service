@@ -1,198 +1,59 @@
 [
-  {
-    "id": "HSL:1020454",
-    "type": "stop",
-    "address": {
-      "code": "0302",
-      "name": "Rautatieasema",
-      "desc": "Kaivokatu",
-      "platformCode": "42",
-      "nextDeparture": "Today at 14:49 9",
-      "gtfsId": "HSL:1020454"
+    {
+        "address": "Pasila 0071, Helsinki",
+        "lat": 60.19941,
+        "name": "Pasila",
+        "lon": 24.93212,
+        "selectedIconId": "icon-icon_place",
+        "favouriteId": "e2853d81-56a9-4024-bab0-dd7f59870560",
+        "gid": "gtfshsl:stop:GTFS:HSL:1174502#0071",
+        "gtfsId": "HSL:1174502",
+        "code": "0071",
+        "layer": "stop",
+        "type": "stop",
+        "lastUpdated": 1585548728
+    },
+    {
+        "address": "HSL, Opastinsilta 6A, Helsinki",
+        "lat": 60.199102,
+        "name": "HSL",
+        "lon": 24.940497,
+        "selectedIconId": "icon-icon_work",
+        "favouriteId": "501562fa-9e35-4d78-804a-47b9e1f1b21a",
+        "gid": "openstreetmap:venue:node:2136579378",
+        "layer": "venue",
+        "type": "place",
+        "lastUpdated": 1584536675
+    },
+    {
+        "address": "CGI, Karvaamokuja 2d, Helsinki",
+        "lat": 60.21433,
+        "name": "Työ",
+        "lon": 24.880925,
+        "selectedIconId": "icon-icon_work",
+        "favouriteId": "3b6971c2-af93-4274-acfa-90f63f6a4154",
+        "gid": "openstreetmap:venue:way:23243032",
+        "layer": "venue",
+        "type": "place",
+        "lastUpdated": 1584536680
+    },
+    {
+        "type": "route",
+        "gtfsId": "HSL:2550",
+        "lastUpdated": 1585548606,
+        "favouriteId": "ee4004ce-561b-4608-8e71-452d5d6c5684"
+    },
+    {
+        "address": "Rautatientori, Helsinki",
+        "lat": 60.171283,
+        "name": "Steissi",
+        "lon": 24.942572,
+        "selectedIconId": "icon-icon_place",
+        "favouriteId": "7df600a4-97b0-4ee4-b548-c79c46847d61",
+        "gid": "gtfshsl:station:GTFS:HSL:1000003",
+        "gtfsId": "HSL:1000003",
+        "layer": "station",
+        "type": "station",
+        "lastUpdated": 1585548719
     }
-  },
-  {
-    "id": "HSL:1293133",
-    "isStation": false,
-    "type": "stop",
-    "address": {
-      "code": "1658",
-      "coordinates": [
-        24.89482,
-        60.22891
-      ],
-      "desc": "Pohjois-Haaga",
-      "label": "Ida Aalbergin tie 1658, Pohjois-Haaga, Helsinki",
-      "lat": 60.22891,
-      "locality": "Helsinki",
-      "lon": 24.89482,
-      "name": "Ida Aalbergin tie",
-      "neighbourhood": "Pohjois-Haaga",
-      "postalcode": "00400",
-      "region": "Uusimaa"
-    }
-  },
-  {
-    "id": "HSL:1000202",
-    "type": "stop",
-    "isStation": true,
-    "address": {
-      "code": null,
-      "coordinates": [
-        24.933114,
-        60.199228
-      ],
-      "desc": "Keski-Pasila",
-      "label": "Pasilan asema, Keski-Pasila, Helsinki",
-      "lat": 60.199228,
-      "locality": "Helsinki",
-      "lon": 24.933114,
-      "name": "Pasilan asema",
-      "neighbourhood": "Keski-Pasila",
-      "postalcode": "00520",
-      "region": "Uusimaa"
-    }
-  },
-  {
-    "id": "HSL:9010216",
-    "type": "stop",
-    "isStation": false,
-    "address": {
-      "code": "Ke0116",
-      "coordinates": [
-        25.08438,
-        60.40999
-      ],
-      "desc": "Kerava",
-      "label": "Sepontie Ke0116, Kerava",
-      "lat": 60.40999,
-      "locality": "Kerava",
-      "lon": 25.08438,
-      "name": "Sepontie",
-      "postalcode": "04200",
-      "region": "Uusimaa"
-    }
-  },
-  {
-    "id": "HSL:1234567",
-    "isStation": false,
-    "type": "stop",
-    "address": {
-      "code": "1234",
-      "coordinates": [],
-      "label": "Stop without description 1234, Unknown",
-      "lat": null,
-      "locality": null,
-      "lon": null,
-      "name": "Stop without description",
-      "neighbourhood": null,
-      "postalcode": null,
-      "region": null
-    }
-  },
-  {
-    "id": "HSL:0123456",
-    "isStation": false,
-    "type": "stop",
-    "address": {
-      "code": "0123",
-      "coordinates": [],
-      "desc": "Stop with same name and description",
-      "label": "Stop with same name and description (0123), Unknown",
-      "lat": null,
-      "locality": null,
-      "lon": null,
-      "name": "Stop with same name and description",
-      "neighbourhood": null,
-      "postalcode": null,
-      "region": null
-    }
-  },
-  {
-    "id": "node:472906011",
-    "name": "Tafe's Home",
-    "type": "place",
-    "iconName": "home",
-    "status": "favourite-place-status-home",
-    "address": {
-      "name": "Mäkelänkatu 34",
-      "housenumber": "34",
-      "street": "Mäkelänkatu",
-      "postalcode": "00550",
-      "region": "Uusimaa",
-      "locality": "Helsinki",
-      "neighbourhood": "Vallila",
-      "label": "Mäkelänkatu 34, Helsinki",
-      "lat": 60.194814,
-      "lon": 24.95569
-    }
-  },
-  {
-    "id": "way:8042215",
-    "name": "Kiasma",
-    "type": "place",
-    "iconName": "marker",
-    "address": {
-      "name": "Kiasma",
-      "housenumber": "2",
-      "street": "Mannerheiminaukio",
-      "postalcode": "00100",
-      "region": "Uusimaa",
-      "locality": "Helsinki",
-      "neighbourhood": "Kluuvi",
-      "label": "Kiasma, Mannerheiminaukio 2, Helsinki",
-      "lat": 60.171535,
-      "lon": 24.936893
-    }
-  },
-  {
-    "id": "way:26390540",
-    "name": "Arena Center Ruskeasuo",
-    "type": "place",
-    "iconName": "sport",
-    "address": {
-      "name": "Arena Center Ruskeasuo",
-      "housenumber": "3",
-      "street": "Nauvontie",
-      "postalcode": "00280",
-      "region": "Uusimaa",
-      "locality": "Helsinki",
-      "neighbourhood": "Vanha Ruskeasuo",
-      "label": "Arena Center Ruskeasuo, Nauvontie 3, Helsinki",
-      "lat": 60.20647,
-      "lon": 24.901767
-    }
-  },
-  {
-    "id": "node:4412982883",
-    "name": "Pasila",
-    "type": "place",
-    "iconName": "briefcase",
-    "address": {
-      "name": "Pasila",
-      "postalcode": "00520",
-      "region": "Uusimaa",
-      "locality": "Helsinki",
-      "neighbourhood": "Keski-Pasila",
-      "label": "Pasila, Keski-Pasila, Helsinki",
-      "lat": 60.197873,
-      "lon": 24.932265
-    }
-  },
-  {
-    "id": "mml-10012245",
-    "name": "Mika Häkkinen's neighbourhood",
-    "type": "place",
-    "iconName": "marker",
-    "address": {
-      "name": "Martinlaakso",
-      "postalcode": "01720",
-      "region": "Uusimaa",
-      "locality": "Vantaa",
-      "neighbourhood": "Varisto",
-      "label": "Martinlaakso, Vantaa",
-      "lat": 60.27848,
-      "lon": 24.826433
-    }
-  }
 ]
