@@ -64,7 +64,8 @@ export default async function (context: AzureContext, req: Request) {
   }
   const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
   const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
-  const key = `${req.query.store}-${req.params.id}`
+  const store = req.query.store
+  const key = store ? `${store}-${req.params.id}` : req.params.id
   const waitForRedis = (client) => new Promise((resolve, reject) => {
     client.on('ready', async() => {
       context.log('redis connected')

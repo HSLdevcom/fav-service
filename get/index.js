@@ -79,7 +79,8 @@ async function _default(context, req) {
     }
   } : {};
   const client = new _ioredis.default(settings.redisPort, settings.redisHost, redisOptions);
-  const key = `${req.query.store}-${req.params.id}`;
+  const store = req.query.store;
+  const key = store ? `${store}-${req.params.id}` : req.params.id;
 
   const waitForRedis = client => new Promise((resolve, reject) => {
     client.on('ready', async () => {

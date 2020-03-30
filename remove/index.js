@@ -60,12 +60,13 @@ async function _default(context, req) {
     settings.redisPass = (0, _helpers.getRedisPass)();
     (0, _validator.default)(deleteSchema, req);
     context.log(req);
-    const key = `${req.query.store}-${req.params.id}`;
+    const store = req.query.store;
+    const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');
     const dataStorage = await (0, _Agent.getDataStorage)(req.params.id);
     context.log(`got dataStorage with id ${dataStorage.id}`);
     context.log('deleting items');
-    const responses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, req.query.store);
+    const responses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, store);
     context.log('deleted items');
     const success = req.body.map((key, i) => {
       return {

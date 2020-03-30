@@ -14,6 +14,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function mergeFavorites(currentFavorites, newFavorites, store) {
   const newData = {};
   const currentData = Object.values(currentFavorites).filter(elem => elem);
+  const prefix = store ? `${store}-` : '';
   newFavorites.forEach(favorite => {
     let duplicateId;
     const isDuplicate = currentData.some(item => {
@@ -24,11 +25,11 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
     });
 
     if (isDuplicate) {
-      newData[`${store}-${duplicateId}`] = _objectSpread({}, favorite, {
+      newData[`${prefix}${duplicateId}`] = _objectSpread({}, favorite, {
         favouriteId: duplicateId
       });
     } else {
-      newData[`${store}-${favorite.favouriteId}`] = favorite;
+      newData[`${prefix}${favorite.favouriteId}`] = favorite;
     }
   });
   return Object.assign(currentFavorites, newData);
