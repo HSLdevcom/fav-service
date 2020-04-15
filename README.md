@@ -43,3 +43,30 @@ FAVORITES_HOST is used in proxies.json to emulate rest api structure. For exampl
 ```bash
 yarn start
 ```
+
+### How to use
+
+The service uses data model defined in `https://gist.github.com/joonasrissanen/ed99e15a49ad9ae1dd8e5ca94bbe5612`.
+
+Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}`.
+
+
+GET
+```
+Authorization: Bearer <JWT_Access_token>
+Method: GET
+```
+
+PUT
+```
+Authorization: Bearer <JWT_Access_token>
+Method: PUT
+Body: [<favourite_objects>]
+```
+
+DELETE
+```
+Authorization: Bearer <JWT_Access_token>
+Method: DELETE
+Body: [<favouriteIds>]
+```
