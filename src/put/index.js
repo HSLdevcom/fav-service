@@ -35,8 +35,8 @@ const updateSchema = {
           selectedIconId: {type: 'string'},
           layer: {type: 'string'},
         },
+        required: ['favouriteId', 'type', 'lastUpdated'],
       },
-      required: ['favouriteId', 'type', 'lastUpdated'],
       additionalProperties: false,
     },
     params: {
