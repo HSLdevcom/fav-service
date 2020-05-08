@@ -27,7 +27,8 @@ const updateSchema = {
         type: 'object',
         properties: {
           favouriteId: {
-            type: 'string'
+            type: 'string',
+            format: 'uuid'
           },
           type: {
             type: 'string'
@@ -60,7 +61,7 @@ const updateSchema = {
             type: 'string'
           }
         },
-        required: ['favouriteId', 'type', 'lastUpdated']
+        required: ['type', 'lastUpdated']
       },
       additionalProperties: false
     },

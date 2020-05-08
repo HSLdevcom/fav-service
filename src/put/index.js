@@ -23,7 +23,7 @@ const updateSchema = {
       items: {
         type: 'object',
         properties: {
-          favouriteId: {type: 'string'},
+          favouriteId: {type: 'string', format: 'uuid'},
           type: {type: 'string'},
           lastUpdated: {type: 'number'},
           gtfsId: {type: 'string'},
@@ -35,7 +35,7 @@ const updateSchema = {
           selectedIconId: {type: 'string'},
           layer: {type: 'string'},
         },
-        required: ['favouriteId', 'type', 'lastUpdated'],
+        required: ['type', 'lastUpdated'],
       },
       additionalProperties: false,
     },
