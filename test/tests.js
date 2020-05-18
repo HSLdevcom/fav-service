@@ -98,7 +98,7 @@ test.serial('get favorites with non-existing hslid', async(t) => {
       id: 'asdfadsf',
     },
     query: {
-      store: 'test'
+      store: 'test',
     },
     method: 'GET',
   }
@@ -121,14 +121,14 @@ test.serial('put favorites for existing hslid', async(t) => {
       id: 'foobar',
     },
     query: {
-      store: 'test'
+      store: 'test',
     },
     method: 'PUT',
     body: [{
-      favouriteId: 'barbar',
+      favouriteId: '3b6971c2-af93-4274-acfa-90f63f6a4154',
       type: 'stop',
       address: 'Foobar',
-      lastUpdated: 1585548728
+      lastUpdated: 1585548728,
     }],
   }
   await put(context, request)
@@ -151,13 +151,13 @@ test.serial('put favorites for existing hslid non-existing dataStorage', async(t
     },
     method: 'PUT',
     query: {
-      store: 'test'
+      store: 'test',
     },
     body: [{
-      favouriteId: 'barbar',
+      favouriteId: '3b6971c2-af93-4274-acfa-90f63f6a4154',
       type: 'stop',
       address: 'Foobar',
-      lastUpdated: 1585548728
+      lastUpdated: 1585548728,
     }],
   }
   await put(context, request)
@@ -176,7 +176,7 @@ test.serial('get favorites for existing hslid', async(t) => {
       id: 'barbar',
     },
     query: {
-      store: 'test'
+      store: 'test',
     },
     method: 'GET',
   }
@@ -199,7 +199,7 @@ test.serial('delete with id', async(t) => {
       id: 'fafa',
     },
     query: {
-      store: 'test'
+      store: 'test',
     },
     body: ['asd', 'fafs'],
   }
@@ -217,7 +217,7 @@ test.serial('delete with non-existing hslid', async(t) => {
       id: 'fafa',
     },
     query: {
-      store: 'test'
+      store: 'test',
     },
     body: ['asd', 'fafs'],
   }
