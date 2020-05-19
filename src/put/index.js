@@ -23,42 +23,21 @@ const updateSchema = {
       items: {
         type: 'object',
         properties: {
-          id: {type: 'string'},
-          name: {type: 'string'},
+          favouriteId: {type: 'string', format: 'uuid'},
           type: {type: 'string'},
-          iconName: {type: 'string'},
-          isStation: {type: 'boolean'},
-          status: {type: 'string'},
-          address: {
-            type: 'object',
-            properties: {
-              name: {type: 'string'},
-              desc: {type: 'string'},
-              housenumber: {type: 'string'},
-              street: {type: 'string'},
-              postalcode: {type: ['string', 'null']},
-              region: {type: ['string', 'null']},
-              locality: {type: ['string', 'null']},
-              neighbourhood: {type: ['string', 'null']},
-              label: {type: 'string'},
-              lat: {type: ['number', 'null']},
-              lon: {type: ['number', 'null']},
-              code: {type: ['string', 'null']},
-              platformCode: {type: 'string'},
-              nextDeparture: {type: 'string'},
-              gtfsId: {type: 'string'},
-              coordinates: {
-                type: 'array',
-                items: {type: 'number'},
-              },
-            },
-            required: ['name'],
-            additionalProperties: false,
-          },
+          lastUpdated: {type: 'number'},
+          gtfsId: {type: 'string'},
+          gid: {type: 'string'},
+          name: {type: 'string'},
+          address: {type: 'string'},
+          lat: {type: 'number'},
+          lon: {type: 'number'},
+          selectedIconId: {type: 'string'},
+          layer: {type: 'string'},
         },
-        required: ['id', 'type', 'address'],
-        additionalProperties: false,
+        required: ['type', 'lastUpdated'],
       },
+      additionalProperties: false,
     },
     params: {
       type: 'object',
@@ -68,6 +47,13 @@ const updateSchema = {
       required: ['id'],
       additionalProperties: false,
     },
+    query: {
+      type: 'object',
+      properties: {
+        store: {type: 'string'},
+      },
+      required: ['store'],
+    },
     method: {
       type: 'string',
       pattern: 'PUT',
@@ -76,7 +62,7 @@ const updateSchema = {
   required: ['method', 'params', 'body'],
 }
 
-export default async function(context: AzureContext, req: Request) {
+export default async function (context: AzureContext, req: Request) {
   context.log(req)
   try {
     const cache = {}
@@ -93,7 +79,7 @@ export default async function(context: AzureContext, req: Request) {
       const oldDataStorage = await getDataStorage(req.params.id)
       context.log('existing datastorage found')
       dataStorage.id = oldDataStorage.id
-    } catch(err) {
+    } catch (err) {
       context.log('error occured')
       if (err.status && err.status === 404) {
         context.log('datastorage not found')
@@ -102,7 +88,7 @@ export default async function(context: AzureContext, req: Request) {
           const newDataStorage = await createDataStorage(req.params.id)
           context.log('datastorage created')
           dataStorage.id = newDataStorage
-        } catch(err) {
+        } catch (err) {
           context.log('something went wrong creating datastorage')
           throw err
         }
@@ -113,21 +99,23 @@ export default async function(context: AzureContext, req: Request) {
       }
     }
     context.log('using dataStorage with id ' + dataStorage.id)
+    const store = req.query.store
+    const key = store ? `${store}-${req.params.id}` : req.params.id
     const currentFavorites: Object = await getFavorites(dataStorage.id)
-    const mergedFavorites = mergeFavorites(currentFavorites, req.body)
+    const mergedFavorites = await mergeFavorites(currentFavorites, req.body, store)
     const response = await updateFavorites(dataStorage.id, mergedFavorites)
     cache.data = mergedFavorites
     // update data to redis with hslid key
     const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
     const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
     const waitForRedis = (client) => new Promise((resolve, reject) => {
-      client.on('ready', async() => {
+      client.on('ready', async () => {
         context.log('redis connected')
-        await client.set(req.params.id, JSON.stringify(cache.data))
+        await client.set(key, JSON.stringify(cache.data))
         await client.quit()
         resolve()
       })
-      client.on('error', async() => {
+      client.on('error', async () => {
         context.log('redis error')
         await client.quit()
         reject()
@@ -139,7 +127,7 @@ export default async function(context: AzureContext, req: Request) {
       status: response.status,
       body: response.data,
     }
-  } catch(err) {
+  } catch (err) {
     context.res = createErrorResponse(err, context.log)
   }
 }

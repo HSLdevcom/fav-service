@@ -26,86 +26,44 @@ const updateSchema = {
       items: {
         type: 'object',
         properties: {
-          id: {
+          favouriteId: {
+            type: 'string',
+            format: 'uuid'
+          },
+          type: {
+            type: 'string'
+          },
+          lastUpdated: {
+            type: 'number'
+          },
+          gtfsId: {
+            type: 'string'
+          },
+          gid: {
             type: 'string'
           },
           name: {
             type: 'string'
           },
-          type: {
-            type: 'string'
-          },
-          iconName: {
-            type: 'string'
-          },
-          isStation: {
-            type: 'boolean'
-          },
-          status: {
-            type: 'string'
-          },
           address: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string'
-              },
-              desc: {
-                type: 'string'
-              },
-              housenumber: {
-                type: 'string'
-              },
-              street: {
-                type: 'string'
-              },
-              postalcode: {
-                type: ['string', 'null']
-              },
-              region: {
-                type: ['string', 'null']
-              },
-              locality: {
-                type: ['string', 'null']
-              },
-              neighbourhood: {
-                type: ['string', 'null']
-              },
-              label: {
-                type: 'string'
-              },
-              lat: {
-                type: ['number', 'null']
-              },
-              lon: {
-                type: ['number', 'null']
-              },
-              code: {
-                type: ['string', 'null']
-              },
-              platformCode: {
-                type: 'string'
-              },
-              nextDeparture: {
-                type: 'string'
-              },
-              gtfsId: {
-                type: 'string'
-              },
-              coordinates: {
-                type: 'array',
-                items: {
-                  type: 'number'
-                }
-              }
-            },
-            required: ['name'],
-            additionalProperties: false
+            type: 'string'
+          },
+          lat: {
+            type: 'number'
+          },
+          lon: {
+            type: 'number'
+          },
+          selectedIconId: {
+            type: 'string'
+          },
+          layer: {
+            type: 'string'
           }
         },
-        required: ['id', 'type', 'address'],
-        additionalProperties: false
-      }
+        required: ['type', 'lastUpdated']
+      },
+      additionalProperties: false
     },
     params: {
       type: 'object',
@@ -116,6 +74,15 @@ const updateSchema = {
       },
       required: ['id'],
       additionalProperties: false
+    },
+    query: {
+      type: 'object',
+      properties: {
+        store: {
+          type: 'string'
+        }
+      },
+      required: ['store']
     },
     method: {
       type: 'string',
@@ -167,8 +134,10 @@ async function _default(context, req) {
     }
 
     context.log('using dataStorage with id ' + dataStorage.id);
+    const store = req.query.store;
+    const key = store ? `${store}-${req.params.id}` : req.params.id;
     const currentFavorites = await (0, _Agent.getFavorites)(dataStorage.id);
-    const mergedFavorites = (0, _mergeFavorites.default)(currentFavorites, req.body);
+    const mergedFavorites = await (0, _mergeFavorites.default)(currentFavorites, req.body, store);
     const response = await (0, _Agent.updateFavorites)(dataStorage.id, mergedFavorites);
     cache.data = mergedFavorites; // update data to redis with hslid key
 
@@ -183,7 +152,7 @@ async function _default(context, req) {
     const waitForRedis = client => new Promise((resolve, reject) => {
       client.on('ready', async () => {
         context.log('redis connected');
-        await client.set(req.params.id, JSON.stringify(cache.data));
+        await client.set(key, JSON.stringify(cache.data));
         await client.quit();
         resolve();
       });

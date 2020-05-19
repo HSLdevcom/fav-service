@@ -31,11 +31,18 @@ const deleteSchema = {
       type: 'string',
       pattern: 'DELETE',
     },
+    query: {
+      type: 'object',
+      properties: {
+        store: {type: 'string'},
+      },
+      required: ['store'],
+    },
   },
   required: ['params', 'method', 'body'],
 }
 
-export default async function(context: AzureContext, req: Request) {
+export default async function (context: AzureContext, req: Request) {
   try {
     const settings = {}
     settings.redisHost = getRedisHost()
@@ -43,12 +50,13 @@ export default async function(context: AzureContext, req: Request) {
     settings.redisPass = getRedisPass()
     validate(deleteSchema, req)
     context.log(req)
-
+    const store = req.query.store
+    const key = store ? `${store}-${req.params.id}` : req.params.id
     context.log('getting dataStorage')
     const dataStorage = await getDataStorage(req.params.id)
     context.log(`got dataStorage with id ${dataStorage.id}`)
     context.log('deleting items')
-    const responses = await deleteFavorites(dataStorage.id, req.body)
+    const responses = await deleteFavorites(dataStorage.id, req.body, store)
     context.log('deleted items')
     const success = req.body.map((key, i) => {
       return {
@@ -62,13 +70,13 @@ export default async function(context: AzureContext, req: Request) {
     const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
     const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
     const waitForRedis = (client) => new Promise((resolve, reject) => {
-      client.on('ready', async() => {
+      client.on('ready', async () => {
         context.log('redis connected')
-        await client.expire(req.params.id, 0)
+        await client.expire(key, 0)
         client.quit()
         resolve()
       })
-      client.on('error', async() => {
+      client.on('error', async () => {
         context.log('redis error')
         client.quit()
         reject()
@@ -80,7 +88,7 @@ export default async function(context: AzureContext, req: Request) {
       status: 200,
       body: JSON.stringify(success),
     }
-  } catch(err) {
+  } catch (err) {
     context.res = createErrorResponse(err, context.log)
   }
 }

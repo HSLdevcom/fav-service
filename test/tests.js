@@ -97,10 +97,13 @@ test.serial('get favorites with non-existing hslid', async(t) => {
     params: {
       id: 'asdfadsf',
     },
+    query: {
+      store: 'test',
+    },
     method: 'GET',
   }
   await get(context, request)
-  t.is(context.res.status, 404)
+  t.is(context.res.status, 500)
 })
 
 test.serial('put favorites for existing hslid', async(t) => {
@@ -117,13 +120,15 @@ test.serial('put favorites for existing hslid', async(t) => {
     params: {
       id: 'foobar',
     },
+    query: {
+      store: 'test',
+    },
     method: 'PUT',
     body: [{
-      id: 'barbar',
+      favouriteId: '3b6971c2-af93-4274-acfa-90f63f6a4154',
       type: 'stop',
-      address: {
-        name: 'Foobar',
-      },
+      address: 'Foobar',
+      lastUpdated: 1585548728,
     }],
   }
   await put(context, request)
@@ -145,12 +150,14 @@ test.serial('put favorites for existing hslid non-existing dataStorage', async(t
       id: 'foobar',
     },
     method: 'PUT',
+    query: {
+      store: 'test',
+    },
     body: [{
-      id: 'barbar',
+      favouriteId: '3b6971c2-af93-4274-acfa-90f63f6a4154',
       type: 'stop',
-      address: {
-        name: 'Foobar',
-      },
+      address: 'Foobar',
+      lastUpdated: 1585548728,
     }],
   }
   await put(context, request)
@@ -167,6 +174,9 @@ test.serial('get favorites for existing hslid', async(t) => {
   const request = {
     params: {
       id: 'barbar',
+    },
+    query: {
+      store: 'test',
     },
     method: 'GET',
   }
@@ -188,6 +198,9 @@ test.serial('delete with id', async(t) => {
     params: {
       id: 'fafa',
     },
+    query: {
+      store: 'test',
+    },
     body: ['asd', 'fafs'],
   }
   await remove(context, request)
@@ -202,6 +215,9 @@ test.serial('delete with non-existing hslid', async(t) => {
     method: 'DELETE',
     params: {
       id: 'fafa',
+    },
+    query: {
+      store: 'test',
     },
     body: ['asd', 'fafs'],
   }
