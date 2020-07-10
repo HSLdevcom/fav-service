@@ -59,7 +59,6 @@ async function _default(context, req) {
     settings.redisPort = (0, _helpers.getRedisPort)();
     settings.redisPass = (0, _helpers.getRedisPass)();
     (0, _validator.default)(deleteSchema, req);
-    context.log(req);
     const store = req.query.store;
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');

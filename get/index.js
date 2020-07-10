@@ -58,7 +58,6 @@ const filterFavorites = favorites => {
 };
 
 async function _default(context, req) {
-  context.log(req);
   const cache = {};
   const settings = {};
 
@@ -110,7 +109,7 @@ async function _default(context, req) {
       const filteredFavorites = filterFavorites(favorites); // cache data
 
       context.log('caching data');
-      await client.set(key, JSON.stringify(favorites));
+      await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
       context.res = {
         status: 200,
         body: filteredFavorites
