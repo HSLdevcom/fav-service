@@ -63,7 +63,6 @@ const updateSchema = {
 }
 
 export default async function (context: AzureContext, req: Request) {
-  context.log(req)
   try {
     const cache = {}
     const settings = {}
@@ -111,7 +110,7 @@ export default async function (context: AzureContext, req: Request) {
     const waitForRedis = (client) => new Promise((resolve, reject) => {
       client.on('ready', async () => {
         context.log('redis connected')
-        await client.set(key, JSON.stringify(cache.data))
+        await client.set(key, JSON.stringify(cache.data), 'EX', 60 * 60 * 24 * 14)
         await client.quit()
         resolve()
       })
