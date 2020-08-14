@@ -31,7 +31,7 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
     } else if (favorite.favouriteId) {
       newData[`${prefix}${favorite.favouriteId}`] = favorite;
     } else {
-      const newFavorite = _objectSpread({}, favorite, {
+      const newFavorite = _objectSpread(_objectSpread({}, favorite), {}, {
         favouriteId: (0, _uuidv.uuid)()
       });
 

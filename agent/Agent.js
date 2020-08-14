@@ -108,7 +108,7 @@ const deleteFavorites = async (dsId, keys, store) => {
         method: 'DELETE',
         endpoint: `/api/rest/v1/datastorage/${dsId}/data/${key}`
       };
-      responses.push((await makeHslIdRequest(options)));
+      responses.push(await makeHslIdRequest(options));
     } catch (err) {
       responses.push(err);
     }
