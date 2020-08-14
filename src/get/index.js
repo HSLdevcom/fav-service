@@ -50,7 +50,6 @@ const filterFavorites = (favorites: Object) => {
 }
 
 export default async function (context: AzureContext, req: Request) {
-  context.log(req)
   const cache = {}
   const settings = {}
   try {
@@ -93,7 +92,7 @@ export default async function (context: AzureContext, req: Request) {
       const filteredFavorites = filterFavorites(favorites)
       // cache data
       context.log('caching data')
-      await client.set(key, JSON.stringify(favorites))
+      await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14)
       context.res = {
         status: 200,
         body: filteredFavorites,

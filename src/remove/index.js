@@ -49,7 +49,6 @@ export default async function (context: AzureContext, req: Request) {
     settings.redisPort = getRedisPort()
     settings.redisPass = getRedisPass()
     validate(deleteSchema, req)
-    context.log(req)
     const store = req.query.store
     const key = store ? `${store}-${req.params.id}` : req.params.id
     context.log('getting dataStorage')
