@@ -13,6 +13,14 @@ function createErrorResponse(error, log) {
   log(error);
 
   if (error instanceof _Err.default) {
+    if (error.message === 'DataStorage not found') {
+      log('no datastorage found, returning empty array');
+      return {
+        body: [],
+        status: 200
+      };
+    }
+
     return {
       body: error.message,
       status: error.status
