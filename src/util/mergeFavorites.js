@@ -22,5 +22,11 @@ export default function mergeFavorites(currentFavorites: Object, newFavorites: A
       newData[`${prefix}${newFavorite.favouriteId}`] = newFavorite
     }
   })
+  const newKeys = Object.keys(newData)
+  const oldKeys = Object.keys(currentFavorites)
+  // Reorder favorites
+  if (oldKeys.every((key) => newKeys.includes(key))) {
+    return newData
+  }
   return Object.assign(currentFavorites, newData)
 }
