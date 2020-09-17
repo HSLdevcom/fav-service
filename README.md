@@ -50,7 +50,6 @@ The service uses data model defined in https://gist.github.com/joonasrissanen/ed
 
 Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}` in development environment.
 Production environment endpoint is at `https://api.digitransit.fi/favourites/{user's_hsl_id}`.
-In dev environment it requires user to sign in to https://hslid-dev.t5.fi/.
 
 
 GET
