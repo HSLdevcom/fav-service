@@ -182,7 +182,7 @@ example:
 	stationId: string, required
   name: string, optional
   networks: array<string>, required
-	lastUpdated, (unix time when favourite was last updated),
+	lastUpdated: number, required (unix time when favourite was last updated)
 }
 ```
 example:
