@@ -8,8 +8,9 @@ export default function mergeFavorites(currentFavorites: Object, newFavorites: A
   newFavorites.forEach((favorite) => {
     let duplicate
     const isDuplicate = currentData.some((item) => {
-      if (item.favouriteId === favorite.favouriteId) {
-        duplicate = item.lastUpdated >= favorite.lastUpdated ? item : favorite
+      if (item.favouriteId === favorite.favouriteId ||
+        (item.gtfsId && favorite.gtfsId && item.gtfsId === favorite.gtfsId)) {
+        duplicate = !favorite.favouriteId || item.lastUpdated >= favorite.lastUpdated ? item : favorite
         return true
       }
     })
