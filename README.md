@@ -149,6 +149,7 @@ example:
 ```
 
 4. stop
+```
 {
 	favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
 	type: "stop", required
@@ -172,8 +173,7 @@ example:
 	lon: 24.90245,
 	lastUpdated: 1602159968
 }
-
-Bike station data model has not been fully designed yet.
+```
 5. bike station
 ```
 {
