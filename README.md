@@ -130,6 +130,7 @@ example:
   type: "station", required
   gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
   address: string, optional (label from geocoding result)
+  name: string, required
   lat: number, optional
   lon: number, optional
   lastUpdated: number, required (unix time when favourite was last updated)
@@ -142,6 +143,7 @@ example:
   type: "station"
   gtfsId: "HSL:1000004",
   address: "Pasila, Helsinki",
+  name: "Pasila",
   lat: 60.198118,
   lon: 24.934074,
   lastUpdated: 1602158421
@@ -156,6 +158,7 @@ example:
   gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
   address: string, optional (label from geocoding result)
   code: string, optional (stop code)
+  name: string, required
   lat: number, optional
   lon: number, optional
   lastUpdated: number, required (unix time when favourite was last updated)
@@ -169,6 +172,7 @@ example:
   gtfsId: "HSL:1180444",
   address: "Kuusitie H0132, Helsinki",
   code: "H0132",
+  name: "Kuusitie",
   lat: 60.194881,
   lon: 24.90245,
   lastUpdated: 1602159968
