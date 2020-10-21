@@ -12,8 +12,5 @@ export default function createErrorResponse(error: Error, log: Function) {
     }
     return {body: error.message, status: error.status}
   }
-  if (error && error.status) {
-    return {status: error.status, body: error.message};
-  }
   return {status: 500, body: error.message}
 }
