@@ -22,7 +22,6 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
     const isDuplicate = currentData.some(item => {
       if (item.favouriteId === favorite.favouriteId || item.gtfsId && favorite.gtfsId && item.gtfsId === favorite.gtfsId) {
         duplicate = !favorite.favouriteId || item.lastUpdated >= favorite.lastUpdated ? item : favorite;
-        console.log('duplikaatti', duplicate);
         return true;
       }
     });
