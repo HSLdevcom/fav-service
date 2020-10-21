@@ -85,7 +85,7 @@ export default async function (context: AzureContext, req: Request) {
         try {
           context.log('trying to create new datastorage')
           const newDataStorage = await createDataStorage(req.params.id)
-          context.log('datastorage created')
+          context.log('datastorage created', newDataStorage)
           dataStorage.id = newDataStorage
         } catch (err) {
           context.log('something went wrong creating datastorage')
