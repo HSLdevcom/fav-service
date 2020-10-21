@@ -85,8 +85,8 @@ export default async function (context: AzureContext, req: Request) {
         try {
           context.log('trying to create new datastorage')
           const newDataStorage = await createDataStorage(req.params.id)
-          context.log('datastorage created', newDataStorage.resources)
-          dataStorage.id = newDataStorage.resources[0].id
+          context.log('datastorage created', newDataStorage)
+          dataStorage.id = newDataStorage.id
         } catch (err) {
           context.log('something went wrong creating datastorage')
           throw err
@@ -103,6 +103,7 @@ export default async function (context: AzureContext, req: Request) {
     const currentFavorites: Object = await getFavorites(dataStorage.id)
     const mergedFavorites = await mergeFavorites(currentFavorites, req.body, store)
     const response = await updateFavorites(dataStorage.id, mergedFavorites)
+    context.log('updateFavorites', response)
     cache.data = mergedFavorites
     // update data to redis with hslid key
     const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}

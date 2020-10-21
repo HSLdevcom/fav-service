@@ -118,8 +118,8 @@ async function _default(context, req) {
         try {
           context.log('trying to create new datastorage');
           const newDataStorage = await (0, _Agent.createDataStorage)(req.params.id);
-          context.log('datastorage created', newDataStorage.resources);
-          dataStorage.id = newDataStorage.resources[0].id;
+          context.log('datastorage created', newDataStorage);
+          dataStorage.id = newDataStorage.id;
         } catch (err) {
           context.log('something went wrong creating datastorage');
           throw err;
@@ -137,6 +137,7 @@ async function _default(context, req) {
     const currentFavorites = await (0, _Agent.getFavorites)(dataStorage.id);
     const mergedFavorites = await (0, _mergeFavorites.default)(currentFavorites, req.body, store);
     const response = await (0, _Agent.updateFavorites)(dataStorage.id, mergedFavorites);
+    context.log('updateFavorites', response);
     cache.data = mergedFavorites; // update data to redis with hslid key
 
     const redisOptions = settings.redisPass ? {
