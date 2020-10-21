@@ -56,7 +56,7 @@ export const createDataStorage = async(id: string) => {
     },
   }
   const response = await makeHslIdRequest(options)
-  return response.data.id
+  return response.data
 }
 
 export const getFavorites = async(dsId: string) => {

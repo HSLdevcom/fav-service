@@ -65,7 +65,7 @@ const createDataStorage = async id => {
     }
   };
   const response = await makeHslIdRequest(options);
-  return response.data.id;
+  return response.data;
 };
 
 exports.createDataStorage = createDataStorage;
