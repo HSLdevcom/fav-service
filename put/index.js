@@ -119,7 +119,7 @@ async function _default(context, req) {
           context.log('trying to create new datastorage');
           const newDataStorage = await (0, _Agent.createDataStorage)(req.params.id);
           context.log('datastorage created', newDataStorage.resources);
-          dataStorage.id = newDataStorage.resources.id;
+          dataStorage.id = newDataStorage.resources[0].id;
         } catch (err) {
           context.log('something went wrong creating datastorage');
           throw err;
