@@ -71,3 +71,132 @@ Authorization: Bearer <JWT_Access_token>
 Method: DELETE
 Body: [<favouriteIds>]
 ```
+
+### Data model
+
+1. route
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "route", required
+  gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
+  lastUpdated: number, required (unix time when favourite was last updated)
+}
+```
+example:
+```
+{
+  favouriteId: "3b668af9-87ec-47f4-8a84-44565a0469da",
+  type: "route",
+  gtfsId: "HSL:2552",
+  lastUpdated: 1602145125
+}
+```
+
+2. place
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "place", required
+  gid: string, optional (from geocoder)
+  name: string, optional (name given by user)
+  address: string, required (label from geocoding result)
+  lat: number, required
+  lon: number, required
+  selectedIconId: string, optional (icon-icon_place, icon-icon_home, icon-icon_work, icon-icon_school, icon-icon_sport or icon-icon_shopping)
+  lastUpdated: number, required (unix time when favourite was last updated)
+  layer: string, optional (from geocoding, describes the type of the place, for example venue, address)
+}
+```
+example:
+```
+{
+  favouriteId: "e1d9d2ee-8431-4575-a5a0-b0c53d0974c2",
+  type: "place",
+  gid: "openstreetmap:address:node:472906011",
+  name: "Mäkelänkatu",
+  address: "Mäkelänkatu 34, Helsinki",
+  lat: 60.194814,
+  lon: 24.95569,
+  selectedIconId: "icon-icon_work",
+  lastUpdated: 1602147439,
+  layer: "address"
+}
+```
+3. station
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "station", required
+  gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
+  address: string, optional (label from geocoding result, '<station name> <stop code if it exists><, neighbourhood name that is sometimes present>, <city name>')
+  gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:station:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
+  lat: number, optional
+  lon: number, optional
+  lastUpdated: number, required (unix time when favourite was last updated)
+}
+```
+example:
+```
+{
+  favouriteId: "2e968157-df03-4f22-89a4-d87c3d82799b",
+  type: "station"
+  gtfsId: "HSL:1000004",
+  address: "Pasila, Keski-Pasila, Helsinki",
+  gid: "gtfshsl:station:GTFS:HSL:1000004",
+  lat: 60.198118,
+  lon: 24.934074,
+  lastUpdated: 1602158421
+}
+```
+
+4. stop
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "stop", required
+  gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
+  address: string, optional (label from geocoding result, '<stop name> <stop code if it exists><, neighbourhood name that is sometimes present>, <city name>')
+  code: string, optional (stop code)
+  gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:stop:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
+  lat: number, optional
+  lon: number, optional
+  lastUpdated: number, required (unix time when favourite was last updated)
+}
+```
+example:
+```
+{
+  favouriteId: "b9e6808b-8adf-4216-b327-b4262301949a",
+  type: "stop"
+  gtfsId: "HSL:1180441",
+  address: "Kuusitie H0137, Laakso, Helsinki",
+  code: "H0137",
+  gid: "gtfshsl:stop:GTFS:HSL:1180441#H0137",
+  lat: 60.19511,
+  lon: 24.90231,
+  lastUpdated: 1602159968
+}
+```
+5. bike station
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "bikeStation", required
+  stationId: string, required
+  name: string, optional
+  networks: array<string>, required
+  lastUpdated: number, required (unix time when favourite was last updated)
+}
+```
+example:
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  type: "bikeStation",
+  stationId: "022",
+  name: "Rautatientori / länsi",
+  networks: ["smoove"],
+  lastUpdated: 1602161141
+}
+```
