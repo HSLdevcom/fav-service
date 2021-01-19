@@ -2,9 +2,10 @@
   "presets": [
     [ "@babel/preset-env", {
       "targets": {
-        "node": "8.11"
+        "node": "12.20"
       },
-      "useBuiltIns": "usage"
+      "useBuiltIns": "usage",
+      "corejs": 3
     }],
     "@ava/stage-4",
     "@ava/transform-test-files",
