@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
-require("core-js/modules/es6.array.iterator.js");
-
 var _validator = _interopRequireDefault(require("../util/validator"));
 
 var _createErrorResponse = _interopRequireDefault(require("../util/createErrorResponse"));
