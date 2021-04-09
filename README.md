@@ -46,8 +46,6 @@ yarn start
 
 ### How to use
 
-The service uses data model defined in https://gist.github.com/joonasrissanen/ed99e15a49ad9ae1dd8e5ca94bbe5612.
-
 Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}` in development environment.
 Production environment endpoint is at `https://api.digitransit.fi/favourites/{user's_hsl_id}`.
 
