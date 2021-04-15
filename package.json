@@ -29,8 +29,9 @@
     "nyc": "^15.1.0"
   },
   "scripts": {
-    "start": "npm-run-all --parallel watch startFunc",
-    "startFunc": "func host start",
+    "dev": "npm-run-all --parallel watch start",
+    "build": "babel src -d . --copy-files",
+    "start": "func host start",
     "watch": "babel --watch src -d . --copy-files",
     "lint": "eslint src",
     "test": "nyc ava -v"
