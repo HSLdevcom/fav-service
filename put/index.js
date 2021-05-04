@@ -31,7 +31,7 @@ const updateSchema = {
             format: 'uuid'
           },
           type: {
-            type: 'string'
+            enum: ['route', 'stop', 'station', 'place', 'bikeStation']
           },
           lastUpdated: {
             type: 'number'
@@ -61,7 +61,11 @@ const updateSchema = {
             type: 'string'
           },
           code: {
-            type: 'string'
+            oneOf: [{
+              type: 'string'
+            }, {
+              type: 'null'
+            }]
           },
           stationId: {
             type: 'string'
@@ -73,7 +77,40 @@ const updateSchema = {
             }
           }
         },
-        required: ['type', 'lastUpdated']
+        allOf: [{
+          if: {
+            properties: {
+              type: {
+                enum: ['route', 'stop', 'station']
+              }
+            }
+          },
+          then: {
+            required: ['type', 'lastUpdated', 'gtfsId']
+          }
+        }, {
+          if: {
+            properties: {
+              type: {
+                const: 'place'
+              }
+            }
+          },
+          then: {
+            required: ['type', 'lastUpdated', 'address']
+          }
+        }, {
+          if: {
+            properties: {
+              type: {
+                const: 'bikeStation'
+              }
+            }
+          },
+          then: {
+            required: ['type', 'lastUpdated', 'stationId', 'networks']
+          }
+        }]
       },
       additionalProperties: false
     },
