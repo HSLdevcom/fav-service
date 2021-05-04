@@ -25,3 +25,5 @@ local.settings.test.json
 
 node_modules
 .nyc_output
+
+requests/
