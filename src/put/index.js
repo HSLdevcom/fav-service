@@ -34,6 +34,9 @@ const updateSchema = {
           lon: {type: 'number'},
           selectedIconId: {type: 'string'},
           layer: {type: 'string'},
+          code: {type: 'string'},
+          stationId: {type: 'string'},
+          networks: {type: 'array', items: { type: 'string' }}
         },
         required: ['type', 'lastUpdated'],
       },

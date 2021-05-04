@@ -59,6 +59,18 @@ const updateSchema = {
           },
           layer: {
             type: 'string'
+          },
+          code: {
+            type: 'string'
+          },
+          stationId: {
+            type: 'string'
+          },
+          networks: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
           }
         },
         required: ['type', 'lastUpdated']
