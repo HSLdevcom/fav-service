@@ -8,10 +8,11 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "ajv": "^6.12.3",
+    "ajv": "^8.2.0",
+    "ajv-formats": "^2.0.2",
     "axios": "^0.21.1",
-    "ioredis": "^4.17.3",
-    "uuidv4": "^6.2.2"
+    "ioredis": "^4.27.1",
+    "uuidv4": "^6.2.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.10",
