@@ -19,9 +19,11 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
   const prefix = store ? `${store}-` : '';
   newFavorites.forEach(favorite => {
     let duplicate;
-    const isDuplicate = currentData.some(item => {
-      if (item.favouriteId === favorite.favouriteId || item.gtfsId && favorite.gtfsId && item.gtfsId === favorite.gtfsId) {
-        duplicate = !favorite.favouriteId || item.lastUpdated >= favorite.lastUpdated ? item : favorite;
+    const isDuplicate = currentData.some(existingFav => {
+      if (existingFav.favouriteId === favorite.favouriteId || existingFav.gtfsId && favorite.gtfsId && existingFav.gtfsId === favorite.gtfsId || existingFav.stationId && favorite.stationId && existingFav.stationId === favorite.stationId) {
+        duplicate = existingFav.lastUpdated >= favorite.lastUpdated ? existingFav : _objectSpread(_objectSpread({}, favorite), {}, {
+          favouriteId: existingFav.favouriteId
+        });
         return true;
       }
     });
