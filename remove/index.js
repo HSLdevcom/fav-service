@@ -65,16 +65,16 @@ async function _default(context, req) {
     const dataStorage = await (0, _Agent.getDataStorage)(req.params.id);
     context.log(`got dataStorage with id ${dataStorage.id}`);
     context.log('deleting items');
-    const responses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, store);
+    const hslidResponses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, store);
     context.log('deleted items');
-    const success = req.body.map((key, i) => {
+    const responses = req.body.map((key, i) => {
       return {
         key,
-        status: responses[i].status,
-        statusText: responses[i].statusText
+        status: hslidResponses[i].status,
+        statusText: hslidResponses[i].statusText
       };
     });
-    context.log(success); // redis delete key from cache
+    context.log(responses); // redis delete key from cache
 
     const redisOptions = settings.redisPass ? {
       password: settings.redisPass,
@@ -99,9 +99,12 @@ async function _default(context, req) {
     });
 
     await waitForRedis(client);
+    const deleteSuccessful = responses.every(response => response.status === 204);
+    const favorites = await (0, _Agent.getFavorites)(dataStorage.id);
+    const responseBody = JSON.stringify(Object.values(favorites));
     context.res = {
-      status: 200,
-      body: JSON.stringify(success)
+      status: deleteSuccessful ? 200 : 400,
+      body: deleteSuccessful ? responseBody : responses
     };
   } catch (err) {
     context.res = (0, _createErrorResponse.default)(err, context.log);
