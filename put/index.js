@@ -212,9 +212,11 @@ async function _default(context, req) {
     });
 
     await waitForRedis(client);
+    const statusCode = response.status === 204 ? 200 : response.status;
+    const responseBody = JSON.stringify(Object.values(mergedFavorites));
     context.res = {
-      status: response.status,
-      body: response.data
+      status: statusCode,
+      body: statusCode > 204 ? response.data : responseBody
     };
   } catch (err) {
     context.res = (0, _createErrorResponse.default)(err, context.log);
