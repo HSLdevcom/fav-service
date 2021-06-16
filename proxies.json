@@ -1,21 +1,21 @@
 {
   "$schema": "http://json.schemastore.org/proxies",
   "proxies": {
-    "List": {
+    "List favourites": {
       "matchCondition": {
         "methods": ["GET"],
         "route": "api/favorites/{id}"
       },
       "backendUri": "https://%FAVORITES_HOST%/api/get?store=fav"
     },
-    "Update": {
+    "Update favourites": {
       "matchCondition": {
         "methods": ["PUT"],
         "route": "api/favorites/{id}"
       },
       "backendUri": "https://%FAVORITES_HOST%/api/put?store=fav"
     },
-    "Delete": {
+    "Delete favourites": {
       "matchCondition": {
         "methods": ["DELETE"],
         "route": "api/favorites/{id}"
