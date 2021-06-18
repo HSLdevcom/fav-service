@@ -4,7 +4,7 @@
     "fileLoggingMode": "always",
     "applicationInsights": {
       "samplingSettings": {
-        "isEnabled": true
+        "isEnabled": false
       }
     },
     "logLevel": {
