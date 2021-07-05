@@ -9,9 +9,13 @@
     },
     "logLevel": {
       "default": "Information",
-      "Host.Results": "Error",
+      "Host.Results": "Information",
       "Function": "Trace",
       "Host.Aggregator": "Trace"
     }
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[2.*, 3.0.0)"
   }
 }
