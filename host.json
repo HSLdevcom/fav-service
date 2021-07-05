@@ -9,7 +9,7 @@
     },
     "logLevel": {
       "default": "Information",
-      "Host.Results": "Information",
+      "Host.Results": "Trace",
       "Function": "Trace",
       "Host.Aggregator": "Trace"
     }
