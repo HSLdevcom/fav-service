@@ -11,7 +11,7 @@ export default function mergeFavorites(currentFavorites: Object, newFavorites: A
       if (existingFav.favouriteId === favorite.favouriteId ||
         (existingFav.gtfsId && favorite.gtfsId && existingFav.gtfsId === favorite.gtfsId) ||
         (existingFav.stationId && favorite.stationId && existingFav.stationId === favorite.stationId)) {
-        duplicate = existingFav.lastUpdated >= favorite.lastUpdated ? existingFav : { ...favorite, favouriteId: existingFav.favouriteId }
+        duplicate = existingFav.lastUpdated >= favorite.lastUpdated ? existingFav : {...favorite, favouriteId: existingFav.favouriteId}
         return true
       }
     })

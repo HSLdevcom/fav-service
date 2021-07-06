@@ -167,7 +167,7 @@ async function _default(context, req) {
         try {
           context.log('trying to create new datastorage');
           const newDataStorage = await (0, _Agent.createDataStorage)(req.params.id);
-          context.log('datastorage created', newDataStorage);
+          context.log('datastorage created');
           dataStorage.id = newDataStorage;
         } catch (err) {
           context.log('something went wrong creating datastorage');
@@ -180,7 +180,6 @@ async function _default(context, req) {
       }
     }
 
-    context.log('using dataStorage with id ' + dataStorage.id);
     const store = req.query.store;
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting favorites from datastorage');

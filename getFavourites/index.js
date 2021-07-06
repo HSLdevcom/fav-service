@@ -103,7 +103,7 @@ async function _default(context, req) {
       context.log('no data in cache');
       context.log('getting dataStorage');
       const dataStorage = await (0, _Agent.getDataStorage)(req.params.id);
-      context.log(`found datastorage with id ${dataStorage.id}`);
+      context.log('found datastorage');
       const favorites = await (0, _Agent.getFavorites)(dataStorage.id);
       const filteredFavorites = filterFavorites(favorites); // cache data
 

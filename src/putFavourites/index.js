@@ -115,7 +115,7 @@ export default async function (context: AzureContext, req: Request) {
         try {
           context.log('trying to create new datastorage')
           const newDataStorage = await createDataStorage(req.params.id)
-          context.log('datastorage created', newDataStorage)
+          context.log('datastorage created')
           dataStorage.id = newDataStorage
         } catch (err) {
           context.log('something went wrong creating datastorage')
@@ -127,7 +127,6 @@ export default async function (context: AzureContext, req: Request) {
         throw err
       }
     }
-    context.log('using dataStorage with id ' + dataStorage.id)
     const store = req.query.store
     const key = store ? `${store}-${req.params.id}` : req.params.id
     context.log('getting favorites from datastorage')

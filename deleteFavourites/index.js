@@ -63,7 +63,6 @@ async function _default(context, req) {
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');
     const dataStorage = await (0, _Agent.getDataStorage)(req.params.id);
-    context.log(`got dataStorage with id ${dataStorage.id}`);
     context.log('deleting items');
     const hslidResponses = await (0, _Agent.deleteFavorites)(dataStorage.id, req.body, store);
     context.log('deleted items');
@@ -73,8 +72,7 @@ async function _default(context, req) {
         status: hslidResponses[i].status,
         statusText: hslidResponses[i].statusText
       };
-    });
-    context.log(responses); // redis delete key from cache
+    }); // redis delete key from cache
 
     const redisOptions = settings.redisPass ? {
       password: settings.redisPass,

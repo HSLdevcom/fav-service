@@ -54,7 +54,6 @@ export default async function (context: AzureContext, req: Request) {
     const key = store ? `${store}-${req.params.id}` : req.params.id
     context.log('getting dataStorage')
     const dataStorage = await getDataStorage(req.params.id)
-    context.log(`got dataStorage with id ${dataStorage.id}`)
     context.log('deleting items')
     const hslidResponses = await deleteFavorites(dataStorage.id, req.body, store)
     context.log('deleted items')
@@ -65,7 +64,6 @@ export default async function (context: AzureContext, req: Request) {
         statusText: hslidResponses[i].statusText,
       }
     })
-    context.log(responses)
     // redis delete key from cache
     const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {}
     const client = new Redis(settings.redisPort, settings.redisHost, redisOptions)
@@ -84,7 +82,7 @@ export default async function (context: AzureContext, req: Request) {
     })
     await waitForRedis(client)
 
-    const deleteSuccessful = responses.every(response => response.status === 204)
+    const deleteSuccessful = responses.every((response) => response.status === 204)
     const favorites = await getFavorites(dataStorage.id)
     const responseBody = JSON.stringify(Object.values(favorites))
     context.res = {

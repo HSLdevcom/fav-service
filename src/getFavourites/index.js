@@ -86,7 +86,7 @@ export default async function (context: AzureContext, req: Request) {
       context.log('no data in cache')
       context.log('getting dataStorage')
       const dataStorage = await getDataStorage(req.params.id)
-      context.log(`found datastorage with id ${dataStorage.id}`)
+      context.log('found datastorage')
       const favorites: Object = await getFavorites(dataStorage.id)
       const filteredFavorites = filterFavorites(favorites)
       // cache data
