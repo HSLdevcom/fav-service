@@ -85,7 +85,6 @@ async function _default(context, req) {
     client.on('ready', async () => {
       context.log('redis connected');
       const data = await client.get(key);
-      context.log(data);
       cache.data = JSON.parse(data);
       resolve();
     });
