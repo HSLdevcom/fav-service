@@ -1,55 +1,58 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
   getHslIdUrl,
   getManagementClientCredentials,
   getManagementClientId,
 } from '../util/helpers';
 import Err from '../util/Err';
-import {
-  HsldIdOptions,
-  Favourites
-} from '../util/types';
+import { HsldIdOptions, Favourites } from '../util/types';
 
-
-const makeHslIdRequest = async(options: HsldIdOptions): Promise<AxiosResponse> => {
+const makeHslIdRequest = async (
+  options: HsldIdOptions,
+): Promise<AxiosResponse> => {
   const hslIdUrl = getHslIdUrl();
   const credentials = getManagementClientCredentials();
   options.url = `${hslIdUrl}${options.endpoint}`;
   options.headers = {
-    'Authorization': credentials,
+    Authorization: credentials,
     'Content-Type': 'application/json',
   };
   const response: AxiosResponse = await axios(options);
   return response;
 };
 
-export const getDataStorage = async(id: string | undefined) => {
+export const getDataStorage = async (
+  id: string | undefined,
+): Promise<{ [key: string]: string }> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
     method: 'GET',
     endpoint: '/api/rest/v1/datastorage',
     params: {
-      dsfilter: `ownerId eq "${id}" and name eq "favorites-${managementClientId || ''}"`,
+      dsfilter: `ownerId eq "${id}" and name eq "favorites-${
+        managementClientId || ''
+      }"`,
     },
   };
   const response = await makeHslIdRequest(options);
   try {
     const dataStorage = response.data.resources[0];
     if (dataStorage) {
-      console.log(dataStorage);
       return dataStorage;
     } else {
       throw new Err(404, 'DataStorage not found');
     }
-  } catch(error) {
+  } catch (error) {
     throw new Err(404, 'DataStorage not found');
   }
 };
 
-export const createDataStorage = async(id: string | undefined) => {
+export const createDataStorage = async (
+  id: string | undefined,
+): Promise<string> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
     method: 'POST',
@@ -67,7 +70,9 @@ export const createDataStorage = async(id: string | undefined) => {
   return response.data.id;
 };
 
-export const getFavorites = async(dsId: string | undefined): Promise<any> => {
+export const getFavorites = async (
+  dsId: string | undefined,
+): Promise<Favourites> => {
   const options: HsldIdOptions = {
     method: 'GET',
     endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
@@ -76,12 +81,15 @@ export const getFavorites = async(dsId: string | undefined): Promise<any> => {
     const response: AxiosResponse = await makeHslIdRequest(options);
     const favourites = response.data;
     return favourites;
-  } catch(err) {
+  } catch (err) {
     return {};
   }
 };
 
-export const updateFavorites = async(dsId: string | undefined, favorites: Favourites) => {
+export const updateFavorites = async (
+  dsId: string | undefined,
+  favorites: Favourites,
+): Promise<AxiosResponse> => {
   const options: HsldIdOptions = {
     method: 'PUT',
     endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
@@ -91,7 +99,11 @@ export const updateFavorites = async(dsId: string | undefined, favorites: Favour
   return response;
 };
 
-export const deleteFavorites = async(dsId: string | undefined, keys: Array<string>, store: string | undefined) => {
+export const deleteFavorites = async (
+  dsId: string | undefined,
+  keys: Array<string>,
+  store: string | undefined,
+): Promise<AxiosResponse<string>[]> => {
   const responses = [];
   for (let i = 0; i < keys.length; i++) {
     try {
@@ -101,7 +113,7 @@ export const deleteFavorites = async(dsId: string | undefined, keys: Array<strin
         endpoint: `/api/rest/v1/datastorage/${dsId}/data/${key}`,
       };
       responses.push(await makeHslIdRequest(options));
-    } catch(err) {
+    } catch (err) {
       responses.push(err);
     }
   }

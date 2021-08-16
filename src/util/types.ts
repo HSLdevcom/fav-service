@@ -5,13 +5,13 @@ enum FavouriteType {
   'stop',
   'station',
   'place',
-  'bikeStation'
+  'bikeStation',
 }
 
 export interface Favourite {
   favouriteId: string;
   type: FavouriteType;
-  lastUpdated: number,
+  lastUpdated: number;
   gid?: string;
   gtfsId?: string;
   name?: string;

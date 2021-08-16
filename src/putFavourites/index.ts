@@ -2,7 +2,7 @@ import { JSONSchemaType } from 'ajv';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
 import { RedisSettings, Cache, Favourites, UpdateSchema } from '../util/types';
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import {
   getFavorites,
   updateFavorites,
@@ -10,11 +10,7 @@ import {
   createDataStorage,
 } from '../agent/Agent';
 import mergeFavorites from '../util/mergeFavorites';
-import {
-  getRedisHost,
-  getRedisPass,
-  getRedisPort,
-} from '../util/helpers';
+import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import * as Redis from 'ioredis';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
@@ -25,26 +21,26 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
       items: {
         type: 'object',
         properties: {
-          favouriteId: {type: 'string', format: 'uuid'},
-          type: {enum: ['route', 'stop', 'station', 'place', 'bikeStation']},
-          lastUpdated: {type: 'number'},
-          gtfsId: {type: 'string'},
-          gid: {type: 'string'},
-          name: {type: 'string'},
-          address: {type: 'string'},
-          lat: {type: 'number'},
-          lon: {type: 'number'},
-          selectedIconId: {type: 'string'},
-          layer: {type: 'string'},
-          code: {oneOf: [{type: 'string'}, {type: 'null'}]},
-          stationId: {type: 'string'},
-          networks: {type: 'array', items: {type: 'string'}},
+          favouriteId: { type: 'string', format: 'uuid' },
+          type: { enum: ['route', 'stop', 'station', 'place', 'bikeStation'] },
+          lastUpdated: { type: 'number' },
+          gtfsId: { type: 'string' },
+          gid: { type: 'string' },
+          name: { type: 'string' },
+          address: { type: 'string' },
+          lat: { type: 'number' },
+          lon: { type: 'number' },
+          selectedIconId: { type: 'string' },
+          layer: { type: 'string' },
+          code: { oneOf: [{ type: 'string' }, { type: 'null' }] },
+          stationId: { type: 'string' },
+          networks: { type: 'array', items: { type: 'string' } },
         },
         allOf: [
           {
             if: {
               properties: {
-                type: {enum: ['route', 'stop', 'station']},
+                type: { enum: ['route', 'stop', 'station'] },
               },
             },
             then: {
@@ -53,7 +49,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
           },
           {
             if: {
-              properties: {type: {const: 'place'}},
+              properties: { type: { const: 'place' } },
             },
             then: {
               required: ['type', 'lastUpdated', 'address'],
@@ -61,7 +57,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
           },
           {
             if: {
-              properties: {type: {const: 'bikeStation'}},
+              properties: { type: { const: 'bikeStation' } },
             },
             then: {
               required: ['type', 'lastUpdated', 'stationId', 'networks'],
@@ -72,16 +68,20 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
       additionalProperties: false,
     },
     hslId: {
-      type: 'string'
+      type: 'string',
     },
     store: {
       type: 'string',
     },
   },
   required: ['hslId', 'store', 'body'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const putFavoritesTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+const putFavoritesTrigger: AzureFunction = async function (
+  context: Context,
+  req: HttpRequest,
+): Promise<void> {
   try {
     const cache: Cache = {};
     const settings: RedisSettings = {};
@@ -95,7 +95,7 @@ const putFavoritesTrigger: AzureFunction = async function (context: Context, req
       body: body,
       hslId: userId,
       store: store,
-    }
+    };
     validate(updateSchema, schema);
     const dataStorage = {
       id: '',
@@ -128,19 +128,37 @@ const putFavoritesTrigger: AzureFunction = async function (context: Context, req
     context.log('getting favorites from datastorage');
     const currentFavorites: Favourites = await getFavorites(dataStorage.id);
     context.log('merging favorites with current ones');
-    const mergedFavorites = await mergeFavorites(currentFavorites, req.body, store);
+    const mergedFavorites = await mergeFavorites(
+      currentFavorites,
+      req.body,
+      store,
+    );
     context.log('updating favorites to datastorage');
     const response = await updateFavorites(dataStorage.id, mergedFavorites);
     cache.data = mergedFavorites;
     // update data to redis with hslid key
-    const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {};
-    const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
-    // const waitForRedis = async (client: RedisClient) => {
-    //   await client.set(key, JSON.stringify(cache.data), 'EX', 60 * 60 * 24 * 14);
-    //   await client.quit();
-    // };
-    // await waitForRedis(client);
-    await client.set(key, JSON.stringify(cache.data), 'EX', 60 * 60 * 24 * 14);
+    const redisOptions = settings.redisPass
+      ? {
+          password: settings.redisPass,
+          tls: { servername: settings.redisHost },
+        }
+      : {};
+    const client = new Redis(
+      settings.redisPort,
+      settings.redisHost,
+      redisOptions,
+    );
+    const waitForRedis = async (client: Redis.Redis) => {
+      await client.set(
+        key,
+        JSON.stringify(cache.data),
+        'EX',
+        60 * 60 * 24 * 14,
+      );
+      await client.quit();
+    };
+    await waitForRedis(client);
+
     const statusCode = response.status === 204 ? 200 : response.status;
     const responseBody: string = JSON.stringify(Object.values(mergedFavorites));
     context.res = {
@@ -148,7 +166,7 @@ const putFavoritesTrigger: AzureFunction = async function (context: Context, req
       body: statusCode > 204 ? response.data : responseBody,
     };
   } catch (err) {
-    context.res = createErrorResponse(err, context.log);
+    context.res = createErrorResponse(err, context);
   }
 };
 

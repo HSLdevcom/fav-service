@@ -26,7 +26,6 @@ export const getManagementClientId = (): string | undefined => {
 
 export const getRedisHost = (): string | undefined => {
   const redisHost = process.env.redisHost;
-  console.log(redisHost)
   validateEnv(redisHost);
   return redisHost;
 };

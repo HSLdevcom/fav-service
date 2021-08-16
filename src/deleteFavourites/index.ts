@@ -1,18 +1,11 @@
 import { JSONSchemaType } from 'ajv';
+import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
 import { RedisSettings, DeleteSchema } from '../util/types';
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import {
-  deleteFavorites,
-  getDataStorage,
-  getFavorites,
-} from '../agent/Agent';
-import {
-  getRedisHost,
-  getRedisPass,
-  getRedisPort,
-} from '../util/helpers';
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { deleteFavorites, getDataStorage, getFavorites } from '../agent/Agent';
+import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import * as Redis from 'ioredis';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
@@ -20,19 +13,23 @@ const deleteSchema: JSONSchemaType<DeleteSchema> = {
   properties: {
     body: {
       type: 'array',
-      items: {type: 'string'},
+      items: { type: 'string' },
     },
     hslId: {
-      type: 'string'
+      type: 'string',
     },
     store: {
       type: 'string',
     },
   },
   required: ['hslId', 'store', 'body'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const deleteFavouriteTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+const deleteFavouriteTrigger: AzureFunction = async function (
+  context: Context,
+  req: HttpRequest,
+): Promise<void> {
   try {
     const settings: RedisSettings = {};
     settings.redisHost = getRedisHost();
@@ -45,13 +42,17 @@ const deleteFavouriteTrigger: AzureFunction = async function (context: Context, 
       body: body,
       hslId: userId,
       store: store,
-    }
+    };
     validate(deleteSchema, schema);
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');
     const dataStorage = await getDataStorage(req.params.id);
     context.log('deleting items');
-    const hslidResponses = await deleteFavorites(dataStorage.id, req.body, store);
+    const hslidResponses = await deleteFavorites(
+      dataStorage.id,
+      req.body,
+      store,
+    );
     context.log('deleted items');
     const responses = req.body.map((key: string, i: number) => {
       return {
@@ -61,24 +62,36 @@ const deleteFavouriteTrigger: AzureFunction = async function (context: Context, 
       };
     });
     // redis delete key from cache
-    const redisOptions = settings.redisPass ? {password: settings.redisPass, tls: {servername: settings.redisHost}} : {};
-    const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
-    const waitForRedis = (client: any): Promise<void> => new Promise((resolve, reject) => {
-      client.on('ready', async () => {
-        context.log('redis connected');
-        await client.expire(key, 0);
-        client.quit();
-        resolve();
+    const redisOptions = settings.redisPass
+      ? {
+          password: settings.redisPass,
+          tls: { servername: settings.redisHost },
+        }
+      : {};
+    const client = new Redis(
+      settings.redisPort,
+      settings.redisHost,
+      redisOptions,
+    );
+    const waitForRedis = (client: Redis.Redis): Promise<void> =>
+      new Promise((resolve, reject) => {
+        client.on('ready', async () => {
+          context.log('redis connected');
+          await client.expire(String(key), 0);
+          client.quit();
+          resolve();
+        });
+        client.on('error', async () => {
+          context.log('redis error');
+          client.quit();
+          reject();
+        });
       });
-      client.on('error', async () => {
-        context.log('redis error');
-        client.quit();
-        reject();
-      });
-    });
     await waitForRedis(client);
 
-    const deleteSuccessful = responses.every((response: any) => response.status === 204);
+    const deleteSuccessful = responses.every(
+      (response: AxiosResponse) => response.status === 204,
+    );
     const favorites = await getFavorites(dataStorage.id);
     const responseBody = JSON.stringify(Object.values(favorites));
     context.res = {
@@ -86,7 +99,7 @@ const deleteFavouriteTrigger: AzureFunction = async function (context: Context, 
       body: deleteSuccessful ? responseBody : responses,
     };
   } catch (err) {
-    context.res = createErrorResponse(err, context.log);
+    context.res = createErrorResponse(err, context);
   }
 };
 
