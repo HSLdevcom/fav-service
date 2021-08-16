@@ -27,3 +27,4 @@ node_modules
 .nyc_output
 
 requests/
+dist/
