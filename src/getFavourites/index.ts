@@ -24,7 +24,7 @@ const getSchema: JSONSchemaType<GetSchema> = {
       type: 'string',
     },
   },
-  required: ['hslId', 'store'],
+  required: ['hslId', 'store'], 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
