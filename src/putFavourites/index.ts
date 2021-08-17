@@ -83,7 +83,6 @@ const putFavoritesTrigger: AzureFunction = async function (
   req: HttpRequest,
 ): Promise<void> {
   try {
-    const cache: Cache = {};
     const settings: RedisSettings = {};
     settings.redisHost = getRedisHost();
     settings.redisPort = getRedisPort();
@@ -135,7 +134,7 @@ const putFavoritesTrigger: AzureFunction = async function (
     );
     context.log('updating favorites to datastorage');
     const response = await updateFavorites(dataStorage.id, mergedFavorites);
-    cache.data = mergedFavorites;
+    const cache: Cache = { data: mergedFavorites };
     // update data to redis with hslid key
     const redisOptions = settings.redisPass
       ? {

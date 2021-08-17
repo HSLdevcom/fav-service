@@ -30,7 +30,7 @@ export interface Favourites {
 }
 
 export interface Cache {
-  data?: Favourites;
+  data: Favourites;
 }
 
 export interface RedisSettings {

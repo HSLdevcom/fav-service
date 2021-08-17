@@ -31,7 +31,7 @@ const getSchema: JSONSchemaType<GetSchema> = {
 const filterFavorites = (favorites: Favourites): Array<Favourite> => {
   const keys = Object.keys(favorites);
   const responseArray: Array<Favourite> = keys.map((key: string) => {
-    return favorites[key];
+    return Object(favorites)[key];
   });
   const filteredArray: Array<Favourite> = responseArray.filter(item => {
     return item !== null;
@@ -43,7 +43,6 @@ const getFavoritesTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest,
 ): Promise<void> {
-  const cache: Cache = {};
   const settings: RedisSettings = {};
   const userId = req.params.id;
   const store = req.query.store;
@@ -70,15 +69,28 @@ const getFavoritesTrigger: AzureFunction = async function (
   );
 
   const key = String(store ? `${store}-${userId}` : userId);
-  const data = String(await client.get(String(key)));
-  const asd: Favourites = JSON.parse(data);
-  cache.data = asd;
+
+  let cache!: Cache;
+  const waitForRedis = (client: Redis.Redis): Promise<void> =>
+    new Promise((resolve, reject) => {
+      client.on('ready', async () => {
+        context.log('redis connected');
+        const data = String(await client.get(key));
+        cache = { data: JSON.parse(data) };
+        resolve();
+      });
+      client.on('error', async () => {
+        context.log('redis error');
+        reject();
+      });
+    });
   try {
     // redis check cache
     context.log('checking redis cache');
-    // await waitForRedis(client);
 
-    if (cache.data === null) {
+    await waitForRedis(client);
+
+    if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
       const dataStorage = await getDataStorage(req.params.id);
