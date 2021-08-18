@@ -6,9 +6,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "put"
-      ],
+      "methods": ["put"],
       "route": "favorites/{id}"
     },
     {
