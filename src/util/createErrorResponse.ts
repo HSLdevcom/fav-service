@@ -5,6 +5,9 @@ interface ErrorResponse {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: Array<any> | string;
   status: number;
+  headers?: {
+    'Content-Type'?: string;
+  };
 }
 
 const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
@@ -13,7 +16,13 @@ const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
   if (error instanceof Err) {
     if (error.message === 'DataStorage not found') {
       context.log('no datastorage found, returning empty array');
-      const response: ErrorResponse = { body: [], status: 200 };
+      const response: ErrorResponse = {
+        body: JSON.stringify([]),
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
       return response;
     }
   }

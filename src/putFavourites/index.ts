@@ -163,6 +163,9 @@ const putFavoritesTrigger: AzureFunction = async function (
     context.res = {
       status: statusCode,
       body: statusCode > 204 ? response.data : responseBody,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
   } catch (err) {
     context.res = createErrorResponse(err, context);

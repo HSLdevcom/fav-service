@@ -97,19 +97,27 @@ const getFavoritesTrigger: AzureFunction = async function (
       context.log('found datastorage');
       const favorites = await getFavorites(dataStorage.id);
       const filteredFavorites = filterFavorites(favorites);
+      const json = JSON.stringify(filteredFavorites);
       // cache data
       context.log('caching data');
       await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
       context.res = {
         status: 200,
-        body: filteredFavorites,
+        body: json,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       };
     } else {
       context.log('found data in cache');
       const filteredFavorites = filterFavorites(cache.data);
+      const json = JSON.stringify(filteredFavorites);
       context.res = {
         status: 200,
-        body: filteredFavorites,
+        body: json,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       };
     }
     client.quit();

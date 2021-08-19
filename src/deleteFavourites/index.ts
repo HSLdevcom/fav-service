@@ -97,6 +97,9 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     context.res = {
       status: deleteSuccessful ? 200 : 400,
       body: deleteSuccessful ? responseBody : responses,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
   } catch (err) {
     context.res = createErrorResponse(err, context);
