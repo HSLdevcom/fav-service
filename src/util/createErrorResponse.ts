@@ -13,23 +13,22 @@ interface ErrorResponse {
 const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
   context.log(error);
 
-  if (error instanceof Err) {
-    if (error.message === 'DataStorage not found') {
-      context.log('no datastorage found, returning empty array');
-      const response: ErrorResponse = {
-        body: JSON.stringify([]),
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-      return response;
-    }
+  if (error.message === 'DataStorage not found') {
+    context.log('no datastorage found, returning empty array');
+    const response: ErrorResponse = {
+      body: JSON.stringify([]),
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    return response;
   }
+
   if (error?.status) {
-    return { body: error.message, status: error.status };
+    return { body: error?.message, status: error?.status };
   }
-  return { status: 500, body: error.message };
+  return { status: 500, body: error?.message };
 };
 
 export default createErrorResponse;
