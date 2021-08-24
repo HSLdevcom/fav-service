@@ -15,16 +15,6 @@ const dataStorageFoundResponse = {
   ],
 };
 
-const dataStorageCreateResponse = {
-  id: '5c75387aa6734c425e86b092',
-  name: 'string',
-  description: 'string',
-  ownerId: 'undefined',
-  adminAccess: ['999'],
-  readAccess: ['999'],
-  writeAccess: ['999'],
-};
-
 describe('getFavourites', () => {
   let context: Context;
 
