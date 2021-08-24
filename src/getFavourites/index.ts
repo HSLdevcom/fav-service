@@ -11,7 +11,7 @@ import {
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
 import createErrorResponse from '../util/createErrorResponse';
-import { getDataStorage, getFavorites } from '../agent/Agent.js';
+import { getDataStorage, getFavorites } from '../agent/Agent';
 import { getRedisHost, getRedisPort, getRedisPass } from '../util/helpers';
 
 const getSchema: JSONSchemaType<GetSchema> = {
@@ -123,7 +123,6 @@ const getFavoritesTrigger: AzureFunction = async function (
     client.quit();
   } catch (err) {
     client.quit();
-    context.log('3333', err);
     context.res = createErrorResponse(err, context);
   }
 };
