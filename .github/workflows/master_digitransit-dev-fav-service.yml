@@ -14,6 +14,48 @@ env:
   NODE_VERSION: "12.x" # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: "Resolve Project Dependencies Using Npm"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          popd
+      - name: "Run linter"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm run lint --if-present
+          popd
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: "Resolve Project Dependencies Using Npm"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          popd
+      - name: "Run tests"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm run test --if-present
+          popd
   build-and-deploy:
     runs-on: windows-latest
     steps:
