@@ -44,8 +44,8 @@ const getFavoritesTrigger: AzureFunction = async function (
   req: HttpRequest,
 ): Promise<void> {
   const settings: RedisSettings = {};
-  const userId = req.params.id;
-  const store = req.query.store;
+  const userId = req?.params?.id;
+  const store = req?.query?.store;
   try {
     const schema: GetSchema = {
       hslId: userId,

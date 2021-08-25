@@ -72,4 +72,26 @@ describe('getFavourites', () => {
     await getFavourites(context, request);
     expect(JSON.parse(context?.res?.body)).toEqual(Object.values(mockData));
   });
+  it(`should fail when param 'id' is not defined`, async () => {
+    const request = {
+      method: 'GET',
+      query: {
+        store: 'fav',
+      },
+      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
+    };
+    await getFavourites(context, request);
+    expect(context?.res?.status).toEqual(400);
+  });
+  it(`should fail when query 'store' is not defined`, async () => {
+    const request = {
+      method: 'GET',
+      params: {
+        id: 'foobar',
+      },
+      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
+    };
+    await getFavourites(context, request);
+    expect(context?.res?.status).toEqual(400);
+  });
 });

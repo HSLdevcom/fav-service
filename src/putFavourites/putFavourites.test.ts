@@ -116,6 +116,42 @@ describe('putFavourites', () => {
     expect(context?.res?.status).toEqual(400);
   });
 
+  it(`should fail when param 'id' is not defined`, async () => {
+    const request = {
+      method: 'PUT',
+      query: {
+        store: 'fav',
+      },
+      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
+    };
+    await putFavourites(context, request);
+    expect(context?.res?.status).toEqual(400);
+  });
+  it(`should fail when query 'store' is not defined`, async () => {
+    const request = {
+      method: 'PUT',
+      params: {
+        id: 'foobar',
+      },
+      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
+    };
+    await putFavourites(context, request);
+    expect(context?.res?.status).toEqual(400);
+  });
+  it(`should fail when request 'body' is not defined`, async () => {
+    const request = {
+      method: 'PUT',
+      params: {
+        id: 'foobar',
+      },
+      query: {
+        store: 'fav',
+      },
+    };
+    await putFavourites(context, request);
+    expect(context?.res?.status).toEqual(400);
+  });
+
   describe('update existing favourite', () => {
     it(`should update existing favourite if new favourite has larger 'lastUpdated value'`, async () => {
       const favourite = {
