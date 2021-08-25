@@ -4,6 +4,7 @@
 
 ### Dependencies
 
+- Node version 12.x 
 - Azure function cli tools (and it's dependencies) https://github.com/Azure/azure-functions-core-tools
 
 ### Install dependencies
