@@ -70,6 +70,6 @@ describe('getFavourites', () => {
       },
     };
     await getFavourites(context, request);
-    expect(JSON.parse(context?.res?.body)).toEqual(mockData);
+    expect(JSON.parse(context?.res?.body)).toEqual(Object.values(mockData));
   });
 });
