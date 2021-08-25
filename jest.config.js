@@ -1,7 +1,7 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   verbose: true,
-  silent: false,
+  silent: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
