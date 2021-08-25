@@ -1,11 +1,6 @@
 import { Context } from '@azure/functions';
 import * as nock from 'nock';
 import deleteFavourites from '.';
-import * as mockData from '../get_mock.json';
-
-const dataStorageNotFoundResponse = {
-  message: 'Datastorage not found',
-};
 
 const dataStorageFoundResponse = {
   resources: [
@@ -13,26 +8,6 @@ const dataStorageFoundResponse = {
       id: 'fafa',
     },
   ],
-};
-
-const dataStorageCreateResponse = {
-  id: 'fafa',
-  name: 'string',
-  description: 'string',
-  ownerId: 'undefined',
-  adminAccess: ['999'],
-  readAccess: ['999'],
-  writeAccess: ['999'],
-};
-
-const baseRequest = {
-  method: 'DELETE',
-  params: {
-    id: 'foobar',
-  },
-  query: {
-    store: 'fav',
-  },
 };
 
 const mockDeleteResponse = {
