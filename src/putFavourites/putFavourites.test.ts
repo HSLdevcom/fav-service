@@ -2,6 +2,7 @@ import { Context } from '@azure/functions';
 import * as nock from 'nock';
 import putFavourites from '.';
 import * as mockData from '../get_mock.json';
+import { Favourite } from '../util/types';
 
 const dataStorageNotFoundResponse = {
   message: 'Datastorage not found',
@@ -51,6 +52,12 @@ describe('putFavourites', () => {
   afterEach(() => nock.cleanAll());
 
   it('should create datastorage if it cannot be found', async () => {
+    const favourite = {
+      type: 'route',
+      gtfsId: 'HSL:3002U',
+      lastUpdated: 1629812636,
+      favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
+    };
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
       .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
@@ -70,28 +77,14 @@ describe('putFavourites', () => {
 
     const request = {
       ...baseRequest,
-      body: [
-        {
-          type: 'route',
-          gtfsId: 'HSL:3002U',
-          lastUpdated: 1629812636,
-          favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
-        },
-      ],
+      body: [favourite],
     };
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
 
     expect(context?.res?.status).toEqual(200);
-    expect(body).toEqual([
-      {
-        type: 'route',
-        gtfsId: 'HSL:3002U',
-        lastUpdated: 1629812636,
-        favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
-      },
-    ]);
+    expect(body).toEqual([favourite]);
   });
 
   it('should not insert favourite without type', async () => {
@@ -121,6 +114,93 @@ describe('putFavourites', () => {
     await putFavourites(context, request);
 
     expect(context?.res?.status).toEqual(400);
+  });
+
+  describe('update existing favourite', () => {
+    it(`should update existing favourite if new favourite has larger 'lastUpdated value'`, async () => {
+      const favourite = {
+        address: 'Pasila 0071, Helsinki',
+        lat: 60.19941,
+        name: 'TEST',
+        lon: 24.93212,
+        selectedIconId: 'icon-icon_place',
+        favouriteId: 'e2853d81-56a9-4024-bab0-dd7f59870560',
+        gid: 'gtfshsl:stop:GTFS:HSL:1174502#0071',
+        gtfsId: 'HSL:1174502',
+        code: '0071',
+        layer: 'stop',
+        type: 'stop',
+        lastUpdated: 1585548729,
+      };
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(204, {});
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      const updated = JSON.parse(context?.res?.body).find(
+        (elem: Favourite) =>
+          elem?.favouriteId === 'e2853d81-56a9-4024-bab0-dd7f59870560',
+      );
+      expect(context?.res?.status).toEqual(200);
+      expect(updated).toEqual(favourite);
+    });
+    it(`should not update existing favourite if new favourite has smaller 'lastUpdated value'`, async () => {
+      const favourite = {
+        address: 'Pasila 0071, Helsinki',
+        lat: 60.19941,
+        name: 'TEST',
+        lon: 24.93212,
+        selectedIconId: 'icon-icon_place',
+        favouriteId: 'e2853d81-56a9-4024-bab0-dd7f59870560',
+        gid: 'gtfshsl:stop:GTFS:HSL:1174502#0071',
+        gtfsId: 'HSL:1174502',
+        code: '0071',
+        layer: 'stop',
+        type: 'stop',
+        lastUpdated: 1,
+      };
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(204, {});
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      const updated = JSON.parse(context?.res?.body).find(
+        (elem: Favourite) =>
+          elem?.favouriteId === 'e2853d81-56a9-4024-bab0-dd7f59870560',
+      );
+      expect(context?.res?.status).toEqual(200);
+      expect(updated.name).toEqual('Pasila');
+    });
   });
 });
 
@@ -167,7 +247,7 @@ describe('putFavourites with type route', () => {
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
-    const expected = [...mockData, favourite];
+    const expected = [...Object.values(mockData), favourite];
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual(expected);
   });
@@ -258,7 +338,7 @@ describe('putFavourites with type stop', () => {
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
-    const expected = [...mockData, favourite];
+    const expected = [...Object.values(mockData), favourite];
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual(expected);
   });
@@ -359,7 +439,7 @@ describe('putFavourites with type station', () => {
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
-    const expected = [...mockData, favourite];
+    const expected = [...Object.values(mockData), favourite];
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual(expected);
   });
@@ -460,7 +540,7 @@ describe('putFavourites with type place', () => {
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
-    const expected = [...mockData, favourite];
+    const expected = [...Object.values(mockData), favourite];
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual(expected);
   });
@@ -557,7 +637,7 @@ describe('putFavourites with type bikeStation', () => {
     await putFavourites(context, request);
 
     const body = JSON.parse(context?.res?.body);
-    const expected = [...mockData, favourite];
+    const expected = [...Object.values(mockData), favourite];
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual(expected);
   });
