@@ -35,13 +35,12 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     settings.redisHost = getRedisHost();
     settings.redisPort = getRedisPort();
     settings.redisPass = getRedisPass();
-    const userId = req.params.id;
-    const store = String(req.query.store);
-    const { body } = req;
+    const userId = req?.params?.id;
+    const store = req?.query?.store;
     const schema: DeleteSchema = {
-      body: body,
+      body: req?.body,
       hslId: userId,
-      store: store,
+      store: store && String(store),
     };
     validate(deleteSchema, schema);
     const key = store ? `${store}-${req.params.id}` : req.params.id;
@@ -50,15 +49,15 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     context.log('deleting items');
     const hslidResponses = await deleteFavorites(
       dataStorage.id,
-      req.body,
+      req?.body,
       store,
     );
     context.log('deleted items');
     const responses = req.body.map((key: string, i: number) => {
       return {
         key,
-        status: hslidResponses[i].status,
-        statusText: hslidResponses[i].statusText,
+        status: hslidResponses[i]?.status,
+        statusText: hslidResponses[i]?.statusText,
       };
     });
     // redis delete key from cache
