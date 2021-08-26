@@ -17,7 +17,7 @@ yarn
 
 ### Configuration
 
-Create file `local.settings.json` in project root.
+Create file `local.settings.json` in src folder.
 
 This file should contain the following for local development. Please make sure to include backend client id and credentials:
 
