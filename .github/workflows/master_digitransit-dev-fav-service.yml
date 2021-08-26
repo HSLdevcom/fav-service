@@ -60,6 +60,7 @@ jobs:
           npm run test
           popd
   build-and-deploy:
+    if: github.ref == 'refs/heads/master'
     runs-on: windows-latest
     needs:
       - lint
