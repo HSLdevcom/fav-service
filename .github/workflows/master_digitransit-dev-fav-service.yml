@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm run lint --if-present
+          npm run lint
           popd
   test:
     runs-on: windows-latest
@@ -54,10 +54,13 @@ jobs:
         shell: pwsh
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm run test --if-present
+          npm run test
           popd
   build-and-deploy:
     runs-on: windows-latest
+    needs:
+      - lint
+      - test
     steps:
       - name: "Checkout GitHub Action"
         uses: actions/checkout@master
@@ -72,7 +75,7 @@ jobs:
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          npm run build --if-present
+          npm run build
           popd
 
       - name: "Run Azure Functions Action"
