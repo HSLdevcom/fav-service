@@ -1,10 +1,13 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js project to Azure Function App - digitransit-dev-fav-service
+name: Process pr or push to master
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
   workflow_dispatch:
@@ -57,6 +60,7 @@ jobs:
           npm run test
           popd
   build-and-deploy:
+    if: github.ref == 'refs/heads/master'
     runs-on: windows-latest
     needs:
       - lint
