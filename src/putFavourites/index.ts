@@ -87,13 +87,12 @@ const putFavoritesTrigger: AzureFunction = async function (
     settings.redisHost = getRedisHost();
     settings.redisPort = getRedisPort();
     settings.redisPass = getRedisPass();
-    const userId = req.params.id;
-    const store = String(req.query.store);
-    const { body } = req;
+    const userId = req?.params?.id;
+    const store = req?.query?.store;
     const schema: UpdateSchema = {
-      body: body,
+      body: req?.body,
       hslId: userId,
-      store: store,
+      store: store && String(store),
     };
     validate(updateSchema, schema);
     const dataStorage = {
@@ -130,7 +129,7 @@ const putFavoritesTrigger: AzureFunction = async function (
     const mergedFavorites = await mergeFavorites(
       currentFavorites,
       req.body,
-      store,
+      String(store),
     );
     context.log('updating favorites to datastorage');
     const response = await updateFavorites(dataStorage.id, mergedFavorites);

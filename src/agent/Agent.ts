@@ -37,8 +37,8 @@ export const getDataStorage = async (
       }"`,
     },
   };
-  const response = await makeHslIdRequest(options);
   try {
+    const response = await makeHslIdRequest(options);
     const dataStorage = response.data.resources[0];
     if (dataStorage) {
       return dataStorage;
