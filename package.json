@@ -43,7 +43,7 @@
     "build": "yarn clean && tsc && yarn copy-files",
     "start": "func host start --prefix dist --language typescript",
     "watch": "yarn copy-files && tsc -w",
-    "lint": "eslint '*/**/*.ts'",
+    "lint": "eslint .",
     "test": "jest",
     "prepare": "husky install"
   }
