@@ -33,6 +33,8 @@ const filterFavorites = (favorites: Favourites): Array<Favourite> => {
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favorites)[key];
   });
+
+
   const filteredArray: Array<Favourite> = responseArray.filter(item => {
     return item !== null;
   });
@@ -68,7 +70,7 @@ const getFavoritesTrigger: AzureFunction = async function (
     redisOptions,
   );
 
-  const key = String(store ? `${store}-${userId}` : userId);
+  const key = String(store ? `${store}-${userId}`  : userId);
 
   let cache!: Cache;
   const waitForRedis = (client: Redis.Redis): Promise<void> =>
@@ -102,6 +104,7 @@ const getFavoritesTrigger: AzureFunction = async function (
       context.log('caching data');
       await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
       context.res = {
+        
         status: 200,
         body: json,
         headers: {
