@@ -564,6 +564,54 @@ describe('putFavourites', () => {
         `data/body/0 must have required property 'address', data/body/0 must match "then" schema`,
       );
     });
+    it(`should not insert favourite without 'lat'`, async () => {
+      const favourite = {
+        name: 'HSL',
+        selectedIconId: 'icon-icon_work',
+        address: 'HSL, Opastinsilta 6A, Helsinki',
+        lon: 24.940497,
+        gid: 'openstreetmap:venue:node:2136579378',
+        type: 'place',
+        lastUpdated: 1623999617,
+        favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
+      };
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'lat', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should not insert favourite without 'lon'`, async () => {
+      const favourite = {
+        name: 'HSL',
+        selectedIconId: 'icon-icon_work',
+        address: 'HSL, Opastinsilta 6A, Helsinki',
+        lat: 60.199102,
+        gid: 'openstreetmap:venue:node:2136579378',
+        type: 'place',
+        lastUpdated: 1623999617,
+        favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
+      };
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'lon', data/body/0 must match "then" schema`,
+      );
+    });
     it(`should not insert favourite without 'lastUpdated'`, async () => {
       const favourite = {
         name: 'HSL',
