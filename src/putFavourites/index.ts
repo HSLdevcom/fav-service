@@ -52,7 +52,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
               properties: { type: { const: 'place' } },
             },
             then: {
-              required: ['type', 'lastUpdated', 'address'],
+              required: ['type', 'lastUpdated', 'address', 'lat', 'lon'],
             },
           },
           {
