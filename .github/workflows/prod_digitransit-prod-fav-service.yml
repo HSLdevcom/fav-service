@@ -1,24 +1,73 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js project to Azure Function App - digitransit-prod-fav-service
+name: Process pr or push to prod
 
 on:
   push:
+    branches:
+      - prod
+  pull_request:
     branches:
       - prod
   workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '~10' # set this to the node version to use (supports 8.x, 10.x, 12.x)
+  NODE_VERSION: '12.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
-  build-and-deploy:
+  lint:
     runs-on: windows-latest
     steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: "Resolve Project Dependencies Using Npm"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          popd
+      - name: "Run linter"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm run lint
+          popd
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: "Resolve Project Dependencies Using Npm"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          popd
+      - name: "Run tests"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm run test
+          popd
+  build-and-deploy:
+    if: github.ref == 'refs/heads/prod'
+    runs-on: windows-latest
+    needs:
+      - lint
+      - test
+    steps:
     - name: 'Checkout GitHub Action'
-      uses: actions/checkout@v2
+      uses: actions/checkout@master
 
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
       uses: actions/setup-node@v1
@@ -30,7 +79,7 @@ jobs:
       run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
         npm install
-        npm run build --if-present
+        npm run build
         popd
 
     - name: 'Run Azure Functions Action'
