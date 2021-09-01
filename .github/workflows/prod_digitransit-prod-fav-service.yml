@@ -31,14 +31,15 @@ jobs:
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
         npm install
         npm run build --if-present
-        npm run test --if-present
         popd
 
     - name: 'Run Azure Functions Action'
-      uses: Azure/functions-action@v1
+      uses: Azure/functions-action@v1.3.2
       id: fa
       with:
         app-name: 'digitransit-prod-fav-service'
         slot-name: 'production'
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_001a591a5a7240fdbd294628e4673434 }}
+        scm-do-build-during-deployment: true
+        enable-oryx-build: true
