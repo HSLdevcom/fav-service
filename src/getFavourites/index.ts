@@ -28,14 +28,17 @@ const getSchema: JSONSchemaType<GetSchema> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const filterFavorites = (favorites: Favourites): Array<Favourite> => {
+const filterFavorites = (
+  favorites: Favourites,
+  type: string | undefined = undefined,
+): Array<Favourite> => {
   const keys = Object.keys(favorites);
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favorites)[key];
   });
-  const filteredArray: Array<Favourite> = responseArray.filter(item => {
-    return item !== null;
-  });
+  const filteredArray: Array<Favourite> = responseArray.filter(
+    item => item && (!type || type === String(item.type)),
+  );
   return filteredArray;
 };
 
@@ -46,6 +49,7 @@ const getFavoritesTrigger: AzureFunction = async function (
   const settings: RedisSettings = {};
   const userId = req?.params?.id;
   const store = req?.query?.store;
+  const type = req?.query?.type;
   try {
     const schema: GetSchema = {
       hslId: userId,
@@ -96,7 +100,7 @@ const getFavoritesTrigger: AzureFunction = async function (
       const dataStorage = await getDataStorage(req.params.id);
       context.log('found datastorage');
       const favorites = await getFavorites(dataStorage.id);
-      const filteredFavorites = filterFavorites(favorites);
+      const filteredFavorites = filterFavorites(favorites, type);
       const json = JSON.stringify(filteredFavorites);
       // cache data
       context.log('caching data');
@@ -110,7 +114,7 @@ const getFavoritesTrigger: AzureFunction = async function (
       };
     } else {
       context.log('found data in cache');
-      const filteredFavorites = filterFavorites(cache.data);
+      const filteredFavorites = filterFavorites(cache.data, type);
       const json = JSON.stringify(filteredFavorites);
       context.res = {
         status: 200,
