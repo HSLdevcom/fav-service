@@ -1,0 +1,21 @@
+{
+  "version": "3.0",
+  "logging": {
+    "fileLoggingMode": "always",
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": false
+      }
+    },
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Trace",
+      "Function": "Trace",
+      "Host.Aggregator": "Trace"
+    }
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[2.*, 3.0.0)"
+  }
+}

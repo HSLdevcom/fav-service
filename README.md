@@ -4,6 +4,7 @@
 
 ### Dependencies
 
+- Node version 12.x 
 - Azure function cli tools (and it's dependencies) https://github.com/Azure/azure-functions-core-tools
 
 ### Install dependencies
@@ -16,7 +17,7 @@ yarn
 
 ### Configuration
 
-Create file `local.settings.json` in project root.
+Create file `local.settings.json` in src folder.
 
 This file should contain the following for local development. Please make sure to include backend client id and credentials:
 
@@ -49,14 +50,15 @@ yarn start
 Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}` in development environment.
 Production environment endpoint is at `https://api.digitransit.fi/favourites/{user's_hsl_id}`.
 
-
 GET
+
 ```
 Authorization: Bearer <JWT_Access_token>
 Method: GET
 ```
 
 PUT
+
 ```
 Authorization: Bearer <JWT_Access_token>
 Method: PUT
@@ -64,6 +66,7 @@ Body: [<favourite_objects>]
 ```
 
 DELETE
+
 ```
 Authorization: Bearer <JWT_Access_token>
 Method: DELETE
@@ -73,6 +76,7 @@ Body: [<favouriteIds>]
 ### Data model
 
 1. route
+
 ```
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
@@ -81,7 +85,9 @@ Body: [<favouriteIds>]
   lastUpdated: number, required (unix time when favourite was last updated)
 }
 ```
+
 example:
+
 ```
 {
   favouriteId: "3b668af9-87ec-47f4-8a84-44565a0469da",
@@ -92,6 +98,7 @@ example:
 ```
 
 2. place
+
 ```
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
@@ -106,7 +113,9 @@ example:
   layer: string, optional (from geocoding, describes the type of the place, for example venue, address)
 }
 ```
+
 example:
+
 ```
 {
   favouriteId: "e1d9d2ee-8431-4575-a5a0-b0c53d0974c2",
@@ -121,7 +130,9 @@ example:
   layer: "address"
 }
 ```
+
 3. station
+
 ```
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
@@ -134,7 +145,9 @@ example:
   lastUpdated: number, required (unix time when favourite was last updated)
 }
 ```
+
 example:
+
 ```
 {
   favouriteId: "2e968157-df03-4f22-89a4-d87c3d82799b",
@@ -149,6 +162,7 @@ example:
 ```
 
 4. stop
+
 ```
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
@@ -162,7 +176,9 @@ example:
   lastUpdated: number, required (unix time when favourite was last updated)
 }
 ```
+
 example:
+
 ```
 {
   favouriteId: "b9e6808b-8adf-4216-b327-b4262301949a",
@@ -176,7 +192,9 @@ example:
   lastUpdated: 1602159968
 }
 ```
+
 5. bike station
+
 ```
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
@@ -187,7 +205,9 @@ example:
   lastUpdated: number, required (unix time when favourite was last updated)
 }
 ```
+
 example:
+
 ```
 {
   favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",

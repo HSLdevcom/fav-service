@@ -1,0 +1,47 @@
+{
+  "fav-ee4004ce-561b-4608-8e71-452d5d6c5684": {
+    "type": "route",
+    "gtfsId": "HSL:2550",
+    "lastUpdated": 1585548606,
+    "favouriteId": "ee4004ce-561b-4608-8e71-452d5d6c5684"
+  },
+  "fav-e2853d81-56a9-4024-bab0-dd7f59870560": {
+    "address": "Pasila 0071, Helsinki",
+    "lat": 60.19941,
+    "name": "Pasila",
+    "lon": 24.93212,
+    "selectedIconId": "icon-icon_place",
+    "favouriteId": "e2853d81-56a9-4024-bab0-dd7f59870560",
+    "gid": "gtfshsl:stop:GTFS:HSL:1174502#0071",
+    "gtfsId": "HSL:1174502",
+    "code": "0071",
+    "layer": "stop",
+    "type": "stop",
+    "lastUpdated": 1585548728
+  },
+  "fav-501562fa-9e35-4d78-804a-47b9e1f1b21a": {
+    "address": "HSL, Opastinsilta 6A, Helsinki",
+    "lat": 60.199102,
+    "name": "HSL",
+    "lon": 24.940497,
+    "selectedIconId": "icon-icon_work",
+    "favouriteId": "501562fa-9e35-4d78-804a-47b9e1f1b21a",
+    "gid": "openstreetmap:venue:node:2136579378",
+    "layer": "venue",
+    "type": "place",
+    "lastUpdated": 1584536675
+  },
+  "fav-7df600a4-97b0-4ee4-b548-c79c46847d61": {
+    "address": "Rautatientori, Helsinki",
+    "lat": 60.171283,
+    "name": "Steissi",
+    "lon": 24.942572,
+    "selectedIconId": "icon-icon_place",
+    "favouriteId": "7df600a4-97b0-4ee4-b548-c79c46847d61",
+    "gid": "gtfshsl:station:GTFS:HSL:1000003",
+    "gtfsId": "HSL:1000003",
+    "layer": "station",
+    "type": "station",
+    "lastUpdated": 1585548719
+  }
+}
