@@ -34,6 +34,6 @@
     "build": "babel src -d . --copy-files",
     "start": "func host start",
     "watch": "babel --watch src -d . --copy-files",
-    "lint": "eslint src",
+    "lint": "eslint src"
   }
 }
