@@ -1,12 +1,13 @@
 import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
+import * as Redis from 'ioredis';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
 import { RedisSettings, DeleteSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { deleteFavorites, getDataStorage, getFavorites } from '../agent/Agent';
 import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
-import * as Redis from 'ioredis';
+import filterFavorites from '../util/filterFavorites';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
   type: 'object',
@@ -37,6 +38,7 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     settings.redisPass = getRedisPass();
     const userId = req?.params?.id;
     const store = req?.query?.store;
+    const type = req?.query?.type;
     const schema: DeleteSchema = {
       body: req?.body,
       hslId: userId,
@@ -92,7 +94,8 @@ const deleteFavouriteTrigger: AzureFunction = async function (
       (response: AxiosResponse) => response.status === 204,
     );
     const favorites = await getFavorites(dataStorage.id);
-    const responseBody = JSON.stringify(Object.values(favorites));
+    const filteredFavorites = filterFavorites(favorites, type);
+    const responseBody = JSON.stringify(Object.values(filteredFavorites));
     context.res = {
       status: deleteSuccessful ? 200 : 400,
       body: deleteSuccessful ? responseBody : responses,
