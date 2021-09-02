@@ -36,9 +36,16 @@ const filterFavorites = (
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favorites)[key];
   });
-  const filteredArray: Array<Favourite> = responseArray.filter(
-    item => item && (!type || type === String(item.type)),
-  );
+  const filteredArray: Array<Favourite> = responseArray.filter(item => {
+    const itemType = String(item.type);
+    if (
+      item &&
+      ((!type && itemType !== 'note') || (type && itemType === type))
+    ) {
+      return true;
+    }
+    return false;
+  });
   return filteredArray;
 };
 
