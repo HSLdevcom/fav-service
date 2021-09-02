@@ -1,4 +1,6 @@
 import { JSONSchemaType } from 'ajv';
+import * as Redis from 'ioredis';
+import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
 import { RedisSettings, Cache, Favourites, UpdateSchema } from '../util/types';
@@ -8,10 +10,11 @@ import {
   updateFavorites,
   getDataStorage,
   createDataStorage,
+  deleteExpiredNotes,
 } from '../agent/Agent';
 import mergeFavorites from '../util/mergeFavorites';
 import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
-import * as Redis from 'ioredis';
+import filterFavorites from '../util/filterFavorites';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -89,6 +92,32 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
+const expireNotes = async (
+  context: Context,
+  dsId: string,
+  favorites: Favourites,
+): Promise<void> => {
+  const hasNotes = Object.keys(favorites).some(
+    key => String(favorites[key].type) === 'note',
+  );
+  if (!hasNotes) {
+    context.log('no notes');
+    return;
+  }
+  context.log('delete expired notes');
+  const deleteResponses = await deleteExpiredNotes(dsId, favorites);
+  if (deleteResponses.length > 0) {
+    const deleteSuccessful = deleteResponses.every(
+      (response: AxiosResponse) => response.status === 204,
+    );
+    if (deleteSuccessful) {
+      context.log('expired notes succesfully');
+    } else {
+      context.log('expiring notes failed');
+    }
+  }
+};
+
 const putFavoritesTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest,
@@ -100,6 +129,7 @@ const putFavoritesTrigger: AzureFunction = async function (
     settings.redisPass = getRedisPass();
     const userId = req?.params?.id;
     const store = req?.query?.store;
+    const type = req?.query?.type;
     const schema: UpdateSchema = {
       body: req?.body,
       hslId: userId,
@@ -142,6 +172,7 @@ const putFavoritesTrigger: AzureFunction = async function (
       req.body,
       String(store),
     );
+    await expireNotes(context, dataStorage.id, mergedFavorites);
     context.log('updating favorites to datastorage');
     const response = await updateFavorites(dataStorage.id, mergedFavorites);
     const cache: Cache = { data: mergedFavorites };
@@ -167,9 +198,11 @@ const putFavoritesTrigger: AzureFunction = async function (
       await client.quit();
     };
     await waitForRedis(client);
-
+    const filteredFavorites = filterFavorites(mergedFavorites, type);
     const statusCode = response.status === 204 ? 200 : response.status;
-    const responseBody: string = JSON.stringify(Object.values(mergedFavorites));
+    const responseBody: string = JSON.stringify(
+      Object.values(filteredFavorites),
+    );
     context.res = {
       status: statusCode,
       body: statusCode > 204 ? response.data : responseBody,
