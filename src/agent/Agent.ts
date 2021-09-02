@@ -119,3 +119,22 @@ export const deleteFavorites = async (
   }
   return responses;
 };
+
+export const deleteExpiredNotes = async (
+  dsId: string | undefined,
+  favorites: Favourites,
+): Promise<AxiosResponse<string>[]> => {
+  let responses = [];
+  const expired: string[] = [];
+  const keys = Object.keys(favorites);
+  keys.forEach(key => {
+    const fav = favorites[key];
+    const now = Math.floor(Date.now() / 1000); // Unix time in seconds
+    if (String(fav.type) === 'note' && Number(fav?.expires) < now) {
+      expired.push(key);
+      delete favorites[key];
+    }
+  });
+  responses = await deleteFavorites(dsId, expired, undefined);
+  return responses;
+};
