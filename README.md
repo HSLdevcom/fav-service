@@ -82,7 +82,7 @@ Body: [<favouriteIds>]
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
   type: "route", required
   gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -109,7 +109,7 @@ example:
   lat: number, required
   lon: number, required
   selectedIconId: string, optional (icon-icon_place, icon-icon_home, icon-icon_work, icon-icon_school, icon-icon_sport or icon-icon_shopping)
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
   layer: string, optional (from geocoding, describes the type of the place, for example venue, address)
 }
 ```
@@ -142,7 +142,7 @@ example:
   gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:station:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
   lat: number, optional
   lon: number, optional
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -173,7 +173,7 @@ example:
   gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:stop:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
   lat: number, optional
   lon: number, optional
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -202,7 +202,7 @@ example:
   stationId: string, required
   name: string, optional
   networks: array<string>, required
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
