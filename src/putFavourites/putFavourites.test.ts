@@ -739,4 +739,101 @@ describe('putFavourites', () => {
       );
     });
   });
+  describe('putFavourites with type note', () => {
+    beforeEach(() => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+      nock('http://localhost')
+        .delete(
+          `/api/rest/v1/datastorage/fafa/data/fav-6ae991cd-f45d-4711-b853-7344a6961da7`,
+        )
+        .reply(204, {});
+    });
+    it('should insert note with correct data format', async () => {
+      const note = {
+        type: 'note',
+        expires: 9999999999,
+        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+      };
+      const request = {
+        ...baseRequest,
+        query: {
+          ...baseRequest.query,
+          type: 'note',
+        },
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+      expect(context?.res?.status).toEqual(200);
+      expect(body).toEqual([note]);
+    });
+    it(`should not insert note without 'favouriteId'`, async () => {
+      const note = {
+        type: 'note',
+        expires: 9999999999,
+      };
+      const request = {
+        ...baseRequest,
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'favouriteId', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should not insert note without 'expires'`, async () => {
+      const note = {
+        type: 'note',
+        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+      };
+      const request = {
+        ...baseRequest,
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'expires', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should delete expired notes`, async () => {
+      const note = {
+        type: 'note',
+        expires: 0,
+        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+      };
+      const request = {
+        ...baseRequest,
+        query: {
+          ...baseRequest.query,
+          type: 'note',
+        },
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+      expect(context?.res?.status).toEqual(200);
+      expect(body).toEqual([]);
+    });
+  });
 });
