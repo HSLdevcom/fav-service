@@ -74,7 +74,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
               properties: { type: { const: 'note' } },
             },
             then: {
-              required: ['type', 'favouriteId'],
+              required: ['type', 'favouriteId', 'expires'],
             },
           },
         ],
