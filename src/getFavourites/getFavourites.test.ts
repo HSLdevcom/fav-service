@@ -94,4 +94,32 @@ describe('getFavourites', () => {
     await getFavourites(context, request);
     expect(context?.res?.status).toEqual(400);
   });
+  it('should return only favourites by defined type in query', async () => {
+    nock('http://localhost')
+      .get('/api/rest/v1/datastorage')
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+      .reply(200, dataStorageFoundResponse);
+
+    nock('http://localhost')
+      .get('/api/rest/v1/datastorage/fafa/data')
+      .reply(200, mockData);
+
+    const request = {
+      method: 'GET',
+      params: {
+        id: 'foobar',
+      },
+      query: {
+        store: 'fav',
+        type: 'route',
+      },
+    };
+
+    await getFavourites(context, request);
+
+    const expected = Object.values(mockData)[0];
+    const body = JSON.parse(context?.res?.body);
+    expect(context?.res?.status).toEqual(200);
+    expect(body).toEqual([expected]);
+  });
 });

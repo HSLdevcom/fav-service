@@ -1,11 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 
-enum FavouriteType {
+export enum FavouriteType {
   'route',
   'stop',
   'station',
   'place',
   'bikeStation',
+  'note',
 }
 
 export interface Favourite {
@@ -23,6 +24,7 @@ export interface Favourite {
   code?: string;
   networks?: Array<string>;
   stationId?: string;
+  expires?: number;
 }
 
 export interface Favourites {
