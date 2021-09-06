@@ -4,4 +4,9 @@
 .vscode
 local.settings.json
 test
-*.test.js
+**/*.test.ts
+jest.config.js
+jest.setup.redis-mock.js
+get_mock.json
+.eslintignore
+.eslintrc
