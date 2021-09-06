@@ -1,7 +1,10 @@
-*.js.map
+**/*.js.map
 *.ts
 .git*
 .vscode
 local.settings.json
 test
-*.test.js
+**/*.test.js
+jest.config.js
+jest.setup.redis-mock.js
+get_mock.json
