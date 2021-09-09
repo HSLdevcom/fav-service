@@ -6,7 +6,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["get"],
+      "methods": ["delete"],
       "route": "favorites/{id}"
     },
     {
@@ -14,5 +14,6 @@
       "direction": "out",
       "name": "res"
     }
-  ]
+  ],
+  "scriptFile": "../dist/deleteFavourites/index.js"
 }
