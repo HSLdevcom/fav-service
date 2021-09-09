@@ -14,4 +14,3 @@ function validate(schema, data) {
     }
 }
 exports.default = validate;
-//# sourceMappingURL=validator.js.map

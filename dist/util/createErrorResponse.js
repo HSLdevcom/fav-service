@@ -19,4 +19,3 @@ const createErrorResponse = (error, context) => {
     return { status: 500, body: error === null || error === void 0 ? void 0 : error.message };
 };
 exports.default = createErrorResponse;
-//# sourceMappingURL=createErrorResponse.js.map

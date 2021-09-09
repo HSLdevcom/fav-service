@@ -7,7 +7,7 @@
     "strict": true,
     "declaration": true,
     "outDir": "dist",
-    "sourceMap": true,
+    "sourceMap": false,
     "resolveJsonModule": true,
   },
   "exclude": ["node_modules", "**/*.test.ts"],

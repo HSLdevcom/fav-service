@@ -8,4 +8,3 @@ var FavouriteType;
     FavouriteType[FavouriteType["place"] = 3] = "place";
     FavouriteType[FavouriteType["bikeStation"] = 4] = "bikeStation";
 })(FavouriteType || (FavouriteType = {}));
-//# sourceMappingURL=types.js.map

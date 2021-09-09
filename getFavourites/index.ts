@@ -67,7 +67,7 @@ const getFavoritesTrigger: AzureFunction = async function (
     settings.redisHost,
     redisOptions,
   );
-
+  context.log('test ci');
   const key = String(store ? `${store}-${userId}` : userId);
 
   let cache!: Cache;

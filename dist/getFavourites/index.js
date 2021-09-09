@@ -62,6 +62,7 @@ const getFavoritesTrigger = function (context, req) {
             ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
             : {};
         const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
+        context.log('test ci');
         const key = String(store ? `${store}-${userId}` : userId);
         let cache;
         const waitForRedis = (client) => new Promise((resolve, reject) => {
@@ -120,4 +121,3 @@ const getFavoritesTrigger = function (context, req) {
     });
 };
 exports.default = getFavoritesTrigger;
-//# sourceMappingURL=index.js.map
