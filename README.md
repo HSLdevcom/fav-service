@@ -225,7 +225,7 @@ example:
 {
   favouriteId: string,	required (must be in uuid format)
   type: "note", required
-  expires: number, required (unix time in seconds when note is automatically expired during PUT request)
+  expires: number, required (unix time in seconds after which note is automatically expired during PUT request)
 }
 ```
 
