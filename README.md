@@ -221,6 +221,8 @@ example:
 
 6. Read notification
 
+This type can only be fetched by providing type=note in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=note)
+
 ```
 {
   favouriteId: string,	required (must be in uuid format)
