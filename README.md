@@ -218,3 +218,23 @@ example:
   lastUpdated: 1602161141
 }
 ```
+
+6. Read notification
+
+```
+{
+  favouriteId: string,	required (must be in uuid format)
+  type: "note", required
+  expires: number, required (unix time in seconds when note is automatically expired during PUT request)
+}
+```
+
+example:
+
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  type: "note",
+  expires: 1602161141,
+}
+```
