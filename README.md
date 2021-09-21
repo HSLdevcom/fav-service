@@ -225,7 +225,8 @@ This type can only be fetched by providing type=note in request's query. (https:
 
 ```
 {
-  favouriteId: string,	required (must be in uuid format)
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  noteId: string, required
   type: "note", required
   expires: number, required (unix time in seconds after which note is automatically expired during PUT request)
 }
@@ -236,7 +237,8 @@ example:
 ```
 {
   favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  noteId: "123",
   type: "note",
-  expires: 1602161141,
+  expires: 1602161141
 }
 ```
