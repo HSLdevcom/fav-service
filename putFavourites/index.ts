@@ -25,6 +25,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
         type: 'object',
         properties: {
           favouriteId: { type: 'string', format: 'uuid' },
+          noteId: { type: 'string' },
           type: {
             enum: ['route', 'stop', 'station', 'place', 'bikeStation', 'note'],
           },
@@ -74,7 +75,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
               properties: { type: { const: 'note' } },
             },
             then: {
-              required: ['type', 'favouriteId', 'expires'],
+              required: ['type', 'expires', 'noteId'],
             },
           },
         ],
