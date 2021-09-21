@@ -11,6 +11,7 @@ export enum FavouriteType {
 
 export interface Favourite {
   favouriteId: string;
+  noteId?: string;
   type: FavouriteType;
   lastUpdated: number;
   gid?: string;

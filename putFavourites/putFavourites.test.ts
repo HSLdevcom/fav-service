@@ -764,6 +764,7 @@ describe('putFavourites', () => {
         type: 'note',
         expires: 9999999999,
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+        noteId: '123',
       };
       const request = {
         ...baseRequest,
@@ -780,7 +781,7 @@ describe('putFavourites', () => {
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual([note]);
     });
-    it(`should not insert note without 'favouriteId'`, async () => {
+    it(`should not insert note without 'noteId'`, async () => {
       const note = {
         type: 'note',
         expires: 9999999999,
@@ -794,13 +795,13 @@ describe('putFavourites', () => {
 
       expect(context?.res?.status).toEqual(400);
       expect(context?.res?.body).toEqual(
-        `data/body/0 must have required property 'favouriteId', data/body/0 must match "then" schema`,
+        `data/body/0 must have required property 'noteId', data/body/0 must match "then" schema`,
       );
     });
     it(`should not insert note without 'expires'`, async () => {
       const note = {
         type: 'note',
-        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+        noteId: '123',
       };
       const request = {
         ...baseRequest,
@@ -818,7 +819,7 @@ describe('putFavourites', () => {
       const note = {
         type: 'note',
         expires: 0,
-        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+        noteId: '123',
       };
       const request = {
         ...baseRequest,
