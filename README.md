@@ -246,7 +246,7 @@ example:
 
 6. Postal code
 
-This type can only be fetched by providing type=note in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=note)
+This type can only be fetched by providing type=postalCode in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=postalCode)
 
 ```
 {
