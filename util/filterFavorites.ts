@@ -12,7 +12,8 @@ const filterFavorites = (
     const itemType = String(item.type);
     if (
       item &&
-      ((!type && itemType !== 'note') || (type && itemType === type))
+      ((!type && !['note', 'postalCode'].includes(itemType)) ||
+        (type && itemType === type))
     ) {
       return true;
     }
