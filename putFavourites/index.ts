@@ -27,7 +27,15 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
           favouriteId: { type: 'string', format: 'uuid' },
           noteId: { type: 'string' },
           type: {
-            enum: ['route', 'stop', 'station', 'place', 'bikeStation', 'note'],
+            enum: [
+              'route',
+              'stop',
+              'station',
+              'place',
+              'bikeStation',
+              'note',
+              'postalCode',
+            ],
           },
           lastUpdated: { type: 'number' },
           gtfsId: { type: 'string' },
@@ -42,6 +50,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
           stationId: { type: 'string' },
           networks: { type: 'array', items: { type: 'string' } },
           expires: { type: 'number' },
+          postalCode: { type: 'string' },
         },
         allOf: [
           {
@@ -76,6 +85,14 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
             },
             then: {
               required: ['type', 'expires', 'noteId'],
+            },
+          },
+          {
+            if: {
+              properties: { type: { const: 'postalCode' } },
+            },
+            then: {
+              required: ['type', 'postalCode', 'lastUpdated'],
             },
           },
         ],

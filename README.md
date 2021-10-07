@@ -242,3 +242,28 @@ example:
   expires: 1602161141
 }
 ```
+
+
+6. Postal code
+
+This type can only be fetched by providing type=postalCode in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=postalCode)
+
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "postalCode", required
+  postalCode: string, required
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
+}
+```
+
+example:
+
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  type: "postalCode",
+  postalCode: "00100",
+  lastUpdated: 1602161141
+}
+```
