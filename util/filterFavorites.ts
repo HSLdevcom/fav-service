@@ -4,6 +4,7 @@ const filterFavorites = (
   favorites: Favourites,
   type: string | undefined = undefined,
 ): Array<Favourite> => {
+  const types = type?.split(',');
   const keys = Object.keys(favorites);
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favorites)[key];
@@ -12,8 +13,8 @@ const filterFavorites = (
     const itemType = String(item.type);
     if (
       item &&
-      ((!type && !['note', 'postalCode'].includes(itemType)) ||
-        (type && itemType === type))
+      ((!types && !['note', 'postalCode'].includes(itemType)) ||
+        (types && types?.includes(itemType)))
     ) {
       return true;
     }
