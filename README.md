@@ -73,6 +73,12 @@ Method: DELETE
 Body: [<favouriteIds>]
 ```
 
+### Query parameters
+
+**`type`** string *optional*
+
+Defines what types of favourites to return. Favourite types separated by comma. For example, `type=route,stop`. Without type parameter, favourites with type *route*, *stop*, *station*, *place* and *bikeStation* are returned.
+
 ### Data model
 
 1. route
@@ -244,7 +250,7 @@ example:
 ```
 
 
-6. Postal code
+7. Postal code
 
 This type can only be fetched by providing type=postalCode in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=postalCode)
 
