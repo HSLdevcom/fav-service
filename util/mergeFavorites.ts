@@ -22,7 +22,10 @@ export default function mergeFavorites(
           existingFav.stationId === favorite.stationId) ||
         (existingFav.noteId &&
           favorite.noteId &&
-          existingFav.noteId === favorite.noteId)
+          existingFav.noteId === favorite.noteId) ||
+        (existingFav.postalCode &&
+          favorite.postalCode &&
+          existingFav.postalCode === favorite.postalCode)
       ) {
         duplicate =
           String(existingFav.type) !== 'note' &&

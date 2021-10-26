@@ -26,6 +26,7 @@ export interface Favourite {
   networks?: Array<string>;
   stationId?: string;
   expires?: number;
+  postalCode?: string;
 }
 
 export interface Favourites {
