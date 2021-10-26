@@ -112,4 +112,3 @@ const getFavoritesTrigger = function (context, req) {
     });
 };
 exports.default = getFavoritesTrigger;
-//# sourceMappingURL=index.js.map

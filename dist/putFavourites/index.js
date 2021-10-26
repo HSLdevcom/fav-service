@@ -213,4 +213,3 @@ const putFavoritesTrigger = function (context, req) {
     });
 };
 exports.default = putFavoritesTrigger;
-//# sourceMappingURL=index.js.map

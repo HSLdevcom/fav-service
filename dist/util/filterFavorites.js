@@ -18,4 +18,3 @@ const filterFavorites = (favorites, type = undefined) => {
     return filteredArray;
 };
 exports.default = filterFavorites;
-//# sourceMappingURL=filterFavorites.js.map

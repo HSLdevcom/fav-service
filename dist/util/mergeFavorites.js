@@ -49,4 +49,3 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
     return Object.assign(currentFavorites, newData);
 }
 exports.default = mergeFavorites;
-//# sourceMappingURL=mergeFavorites.js.map

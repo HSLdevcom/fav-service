@@ -8,4 +8,3 @@ class Err extends Error {
     }
 }
 exports.default = Err;
-//# sourceMappingURL=Err.js.map

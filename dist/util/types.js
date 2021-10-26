@@ -10,4 +10,3 @@ var FavouriteType;
     FavouriteType[FavouriteType["bikeStation"] = 4] = "bikeStation";
     FavouriteType[FavouriteType["note"] = 5] = "note";
 })(FavouriteType = exports.FavouriteType || (exports.FavouriteType = {}));
-//# sourceMappingURL=types.js.map

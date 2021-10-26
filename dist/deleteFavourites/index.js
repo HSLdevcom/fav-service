@@ -103,4 +103,3 @@ const deleteFavouriteTrigger = function (context, req) {
     });
 };
 exports.default = deleteFavouriteTrigger;
-//# sourceMappingURL=index.js.map
