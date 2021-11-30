@@ -73,6 +73,12 @@ Method: DELETE
 Body: [<favouriteIds>]
 ```
 
+### Query parameters
+
+**`type`** string *optional*
+
+Defines what types of favourites to return. Favourite types separated by comma. For example, `type=route,stop`. Without type parameter, favourites with type *route*, *stop*, *station*, *place* and *bikeStation* are returned.
+
 ### Data model
 
 1. route
@@ -82,7 +88,7 @@ Body: [<favouriteIds>]
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
   type: "route", required
   gtfsId: string, required (in a feed scoped format <feedId>:<gtfsId>)
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -109,7 +115,7 @@ example:
   lat: number, required
   lon: number, required
   selectedIconId: string, optional (icon-icon_place, icon-icon_home, icon-icon_work, icon-icon_school, icon-icon_sport or icon-icon_shopping)
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
   layer: string, optional (from geocoding, describes the type of the place, for example venue, address)
 }
 ```
@@ -142,7 +148,7 @@ example:
   gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:station:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
   lat: number, optional
   lon: number, optional
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -173,7 +179,7 @@ example:
   gid: string, optional (unique identifier for geocoder 'gtfs<feedId in lowercase>:stop:GTFS:<feed scoped gtfsId><stop code with # prefix if it exists>')
   lat: number, optional
   lon: number, optional
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -202,7 +208,7 @@ example:
   stationId: string, required
   name: string, optional
   networks: array<string>, required
-  lastUpdated: number, required (unix time when favourite was last updated)
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
 
@@ -215,6 +221,55 @@ example:
   stationId: "022",
   name: "Rautatientori / länsi",
   networks: ["smoove"],
+  lastUpdated: 1602161141
+}
+```
+
+6. Read notification
+
+This type can only be fetched by providing type=note in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=note)
+
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  noteId: string, required
+  type: "note", required
+  expires: number, required (unix time in seconds after which note is automatically expired during PUT request)
+}
+```
+
+example:
+
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  noteId: "123",
+  type: "note",
+  expires: 1602161141
+}
+```
+
+
+7. Postal code
+
+This type can only be fetched by providing type=postalCode in request's query. (https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=postalCode)
+
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "postalCode", required
+  postalCode: string, required
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
+}
+```
+
+example:
+
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  type: "postalCode",
+  postalCode: "00100",
   lastUpdated: 1602161141
 }
 ```

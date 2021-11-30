@@ -14,9 +14,16 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
                     existingFav.gtfsId === favorite.gtfsId) ||
                 (existingFav.stationId &&
                     favorite.stationId &&
-                    existingFav.stationId === favorite.stationId)) {
+                    existingFav.stationId === favorite.stationId) ||
+                (existingFav.noteId &&
+                    favorite.noteId &&
+                    existingFav.noteId === favorite.noteId) ||
+                (existingFav.postalCode &&
+                    favorite.postalCode &&
+                    existingFav.postalCode === favorite.postalCode)) {
                 duplicate =
-                    existingFav.lastUpdated >= favorite.lastUpdated
+                    String(existingFav.type) !== 'note' &&
+                        existingFav.lastUpdated >= favorite.lastUpdated
                         ? existingFav
                         : Object.assign(Object.assign({}, favorite), { favouriteId: existingFav.favouriteId });
                 return true;

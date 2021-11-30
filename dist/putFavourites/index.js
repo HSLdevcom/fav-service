@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Redis = require("ioredis");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
 const mergeFavorites_1 = require("../util/mergeFavorites");
 const helpers_1 = require("../util/helpers");
-const Redis = require("ioredis");
+const filterFavorites_1 = require("../util/filterFavorites");
 const updateSchema = {
     type: 'object',
     properties: {
@@ -24,7 +25,18 @@ const updateSchema = {
                 type: 'object',
                 properties: {
                     favouriteId: { type: 'string', format: 'uuid' },
-                    type: { enum: ['route', 'stop', 'station', 'place', 'bikeStation'] },
+                    noteId: { type: 'string' },
+                    type: {
+                        enum: [
+                            'route',
+                            'stop',
+                            'station',
+                            'place',
+                            'bikeStation',
+                            'note',
+                            'postalCode',
+                        ],
+                    },
                     lastUpdated: { type: 'number' },
                     gtfsId: { type: 'string' },
                     gid: { type: 'string' },
@@ -37,6 +49,8 @@ const updateSchema = {
                     code: { oneOf: [{ type: 'string' }, { type: 'null' }] },
                     stationId: { type: 'string' },
                     networks: { type: 'array', items: { type: 'string' } },
+                    expires: { type: 'number' },
+                    postalCode: { type: 'string' },
                 },
                 allOf: [
                     {
@@ -65,6 +79,22 @@ const updateSchema = {
                             required: ['type', 'lastUpdated', 'stationId', 'networks'],
                         },
                     },
+                    {
+                        if: {
+                            properties: { type: { const: 'note' } },
+                        },
+                        then: {
+                            required: ['type', 'expires', 'noteId'],
+                        },
+                    },
+                    {
+                        if: {
+                            properties: { type: { const: 'postalCode' } },
+                        },
+                        then: {
+                            required: ['type', 'postalCode', 'lastUpdated'],
+                        },
+                    },
                 ],
             },
             additionalProperties: false,
@@ -79,8 +109,26 @@ const updateSchema = {
     required: ['hslId', 'store', 'body'],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 };
+const expireNotes = (context, dsId, favorites) => __awaiter(void 0, void 0, void 0, function* () {
+    const hasNotes = Object.keys(favorites).some(key => String(favorites[key].type) === 'note');
+    if (!hasNotes) {
+        context.log('no notes');
+        return;
+    }
+    context.log('delete expired notes');
+    const deleteResponses = yield Agent_1.deleteExpiredNotes(dsId, favorites);
+    if (deleteResponses.length > 0) {
+        const deleteSuccessful = deleteResponses.every((response) => response.status === 204);
+        if (deleteSuccessful) {
+            context.log('expired notes succesfully');
+        }
+        else {
+            context.log('expiring notes failed');
+        }
+    }
+});
 const putFavoritesTrigger = function (context, req) {
-    var _a, _b;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const settings = {};
@@ -89,6 +137,7 @@ const putFavoritesTrigger = function (context, req) {
             settings.redisPass = helpers_1.getRedisPass();
             const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
             const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
+            const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
             const schema = {
                 body: req === null || req === void 0 ? void 0 : req.body,
                 hslId: userId,
@@ -130,6 +179,7 @@ const putFavoritesTrigger = function (context, req) {
             const currentFavorites = yield Agent_1.getFavorites(dataStorage.id);
             context.log('merging favorites with current ones');
             const mergedFavorites = yield mergeFavorites_1.default(currentFavorites, req.body, String(store));
+            yield expireNotes(context, dataStorage.id, mergedFavorites);
             context.log('updating favorites to datastorage');
             const response = yield Agent_1.updateFavorites(dataStorage.id, mergedFavorites);
             const cache = { data: mergedFavorites };
@@ -146,8 +196,9 @@ const putFavoritesTrigger = function (context, req) {
                 yield client.quit();
             });
             yield waitForRedis(client);
+            const filteredFavorites = filterFavorites_1.default(mergedFavorites, type);
             const statusCode = response.status === 204 ? 200 : response.status;
-            const responseBody = JSON.stringify(Object.values(mergedFavorites));
+            const responseBody = JSON.stringify(Object.values(filteredFavorites));
             context.res = {
                 status: statusCode,
                 body: statusCode > 204 ? response.data : responseBody,

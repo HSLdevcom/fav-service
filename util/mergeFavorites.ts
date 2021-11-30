@@ -19,9 +19,16 @@ export default function mergeFavorites(
           existingFav.gtfsId === favorite.gtfsId) ||
         (existingFav.stationId &&
           favorite.stationId &&
-          existingFav.stationId === favorite.stationId)
+          existingFav.stationId === favorite.stationId) ||
+        (existingFav.noteId &&
+          favorite.noteId &&
+          existingFav.noteId === favorite.noteId) ||
+        (existingFav.postalCode &&
+          favorite.postalCode &&
+          existingFav.postalCode === favorite.postalCode)
       ) {
         duplicate =
+          String(existingFav.type) !== 'note' &&
           existingFav.lastUpdated >= favorite.lastUpdated
             ? existingFav
             : { ...favorite, favouriteId: existingFav.favouriteId };

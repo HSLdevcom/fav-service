@@ -739,4 +739,180 @@ describe('putFavourites', () => {
       );
     });
   });
+  describe('putFavourites with type note', () => {
+    beforeEach(() => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+      nock('http://localhost')
+        .delete(
+          `/api/rest/v1/datastorage/fafa/data/fav-6ae991cd-f45d-4711-b853-7344a6961da7`,
+        )
+        .reply(204, {});
+    });
+    it('should insert note with correct data format', async () => {
+      const note = {
+        type: 'note',
+        expires: 9999999999,
+        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
+        noteId: '123',
+      };
+      const request = {
+        ...baseRequest,
+        query: {
+          ...baseRequest.query,
+          type: 'note',
+        },
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+      expect(context?.res?.status).toEqual(200);
+      expect(body).toEqual([note]);
+    });
+    it(`should not insert note without 'noteId'`, async () => {
+      const note = {
+        type: 'note',
+        expires: 9999999999,
+      };
+      const request = {
+        ...baseRequest,
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'noteId', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should not insert note without 'expires'`, async () => {
+      const note = {
+        type: 'note',
+        noteId: '123',
+      };
+      const request = {
+        ...baseRequest,
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'expires', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should delete expired notes`, async () => {
+      const note = {
+        type: 'note',
+        expires: 0,
+        noteId: '123',
+      };
+      const request = {
+        ...baseRequest,
+        query: {
+          ...baseRequest.query,
+          type: 'note',
+        },
+        body: [note],
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+      expect(context?.res?.status).toEqual(200);
+      expect(body).toEqual([]);
+    });
+  });
+  describe('put favourite with type postalCode', () => {
+    beforeEach(() => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+    });
+
+    it('should insert favourite succesfully with correct data format', async () => {
+      const favourite = {
+        postalCode: '00100',
+        type: 'postalCode',
+        lastUpdated: 1620732626,
+        favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+      };
+
+      const request = {
+        ...baseRequest,
+        query: {
+          ...baseRequest.query,
+          type: 'postalCode',
+        },
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+      const expected = [favourite];
+      expect(context?.res?.status).toEqual(200);
+      expect(body).toEqual(expected);
+    });
+
+    it(`should not insert favourite without 'postalCode'`, async () => {
+      const favourite = {
+        type: 'postalCode',
+        lastUpdated: 1620732626,
+      };
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'postalCode', data/body/0 must match "then" schema`,
+      );
+    });
+    it(`should not insert favourite without 'lastUpdated'`, async () => {
+      const favourite = {
+        postalCode: '00100',
+        type: 'postalCode',
+      };
+
+      const request = {
+        ...baseRequest,
+        body: [favourite],
+      };
+
+      await putFavourites(context, request);
+
+      expect(context?.res?.status).toEqual(400);
+      expect(context?.res?.body).toEqual(
+        `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
+      );
+    });
+  });
 });

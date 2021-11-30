@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Redis = require("ioredis");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
 const helpers_1 = require("../util/helpers");
-const Redis = require("ioredis");
+const filterFavorites_1 = require("../util/filterFavorites");
 const deleteSchema = {
     type: 'object',
     properties: {
@@ -32,7 +33,7 @@ const deleteSchema = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 };
 const deleteFavouriteTrigger = function (context, req) {
-    var _a, _b;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const settings = {};
@@ -41,6 +42,7 @@ const deleteFavouriteTrigger = function (context, req) {
             settings.redisPass = helpers_1.getRedisPass();
             const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
             const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
+            const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
             const schema = {
                 body: req === null || req === void 0 ? void 0 : req.body,
                 hslId: userId,
@@ -85,7 +87,8 @@ const deleteFavouriteTrigger = function (context, req) {
             yield waitForRedis(client);
             const deleteSuccessful = responses.every((response) => response.status === 204);
             const favorites = yield Agent_1.getFavorites(dataStorage.id);
-            const responseBody = JSON.stringify(Object.values(favorites));
+            const filteredFavorites = filterFavorites_1.default(favorites, type);
+            const responseBody = JSON.stringify(Object.values(filteredFavorites));
             context.res = {
                 status: deleteSuccessful ? 200 : 400,
                 body: deleteSuccessful ? responseBody : responses,

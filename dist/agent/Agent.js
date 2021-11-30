@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFavorites = exports.updateFavorites = exports.getFavorites = exports.createDataStorage = exports.getDataStorage = void 0;
+exports.deleteExpiredNotes = exports.deleteFavorites = exports.updateFavorites = exports.getFavorites = exports.createDataStorage = exports.getDataStorage = void 0;
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -112,3 +112,19 @@ const deleteFavorites = (dsId, keys, store) => __awaiter(void 0, void 0, void 0,
     return responses;
 });
 exports.deleteFavorites = deleteFavorites;
+const deleteExpiredNotes = (dsId, favorites) => __awaiter(void 0, void 0, void 0, function* () {
+    let responses = [];
+    const expired = [];
+    const keys = Object.keys(favorites);
+    keys.forEach(key => {
+        const fav = favorites[key];
+        const now = Math.floor(Date.now() / 1000); // Unix time in seconds
+        if (String(fav.type) === 'note' && Number(fav === null || fav === void 0 ? void 0 : fav.expires) < now) {
+            expired.push(key);
+            delete favorites[key];
+        }
+    });
+    responses = yield exports.deleteFavorites(dsId, expired, undefined);
+    return responses;
+});
+exports.deleteExpiredNotes = deleteExpiredNotes;

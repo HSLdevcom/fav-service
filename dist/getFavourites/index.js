@@ -15,6 +15,7 @@ const validator_1 = require("../util/validator");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const Agent_1 = require("../agent/Agent");
 const helpers_1 = require("../util/helpers");
+const filterFavorites_1 = require("../util/filterFavorites");
 const getSchema = {
     type: 'object',
     properties: {
@@ -28,22 +29,13 @@ const getSchema = {
     required: ['hslId', 'store'],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 };
-const filterFavorites = (favorites) => {
-    const keys = Object.keys(favorites);
-    const responseArray = keys.map((key) => {
-        return Object(favorites)[key];
-    });
-    const filteredArray = responseArray.filter(item => {
-        return item !== null;
-    });
-    return filteredArray;
-};
 const getFavoritesTrigger = function (context, req) {
-    var _a, _b;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const settings = {};
         const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
         const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
+        const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
         try {
             const schema = {
                 hslId: userId,
@@ -86,7 +78,7 @@ const getFavoritesTrigger = function (context, req) {
                 const dataStorage = yield Agent_1.getDataStorage(req.params.id);
                 context.log('found datastorage');
                 const favorites = yield Agent_1.getFavorites(dataStorage.id);
-                const filteredFavorites = filterFavorites(favorites);
+                const filteredFavorites = filterFavorites_1.default(favorites, type);
                 const json = JSON.stringify(filteredFavorites);
                 // cache data
                 context.log('caching data');
@@ -101,7 +93,7 @@ const getFavoritesTrigger = function (context, req) {
             }
             else {
                 context.log('found data in cache');
-                const filteredFavorites = filterFavorites(cache.data);
+                const filteredFavorites = filterFavorites_1.default(cache.data, type);
                 const json = JSON.stringify(filteredFavorites);
                 context.res = {
                     status: 200,
