@@ -178,7 +178,7 @@ const putFavoritesTrigger = function (context, req) {
             context.log('getting favorites from datastorage');
             const currentFavorites = yield Agent_1.getFavorites(dataStorage.id);
             context.log('merging favorites with current ones');
-            const mergedFavorites = yield mergeFavorites_1.default(currentFavorites, req.body, String(store), type);
+            const mergedFavorites = yield mergeFavorites_1.default(currentFavorites, req.body, String(store));
             yield expireNotes(context, dataStorage.id, mergedFavorites);
             context.log('updating favorites to datastorage');
             const response = yield Agent_1.updateFavorites(dataStorage.id, mergedFavorites);
