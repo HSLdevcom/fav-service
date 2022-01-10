@@ -9,11 +9,12 @@ const filterFavorites = (
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favorites)[key];
   });
+  const defaultTypes = ['route', 'stop', 'station', 'place', 'bikeStation'];
   const filteredArray: Array<Favourite> = responseArray.filter(item => {
     const itemType = String(item.type);
     if (
       item &&
-      ((!types && !['note', 'postalCode'].includes(itemType)) ||
+      ((!types && defaultTypes.includes(itemType)) ||
         (types && types?.includes(itemType)))
     ) {
       return true;
