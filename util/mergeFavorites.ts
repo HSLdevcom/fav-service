@@ -1,10 +1,12 @@
 import { uuid } from 'uuidv4';
 import { Favourite, Favourites } from './types';
+import filterFavorites from './filterFavorites';
 
 export default function mergeFavorites(
   currentFavorites: Favourites,
   newFavorites: Array<Favourite>,
   store: string,
+  type: string | undefined = undefined,
 ): Favourites {
   const newData: Favourites = {};
   const currentData = Object.values(currentFavorites).filter(elem => elem);
@@ -44,8 +46,8 @@ export default function mergeFavorites(
       newData[`${prefix}${newFavorite.favouriteId}`] = newFavorite;
     }
   });
-  const newKeys = Object.keys(newData);
-  const oldKeys = Object.keys(currentFavorites);
+  const newKeys = Object.keys(filterFavorites(newData, type));
+  const oldKeys = Object.keys(filterFavorites(currentFavorites));
   // Reorder favorites
   if (oldKeys.every(key => newKeys.includes(key))) {
     return newData;

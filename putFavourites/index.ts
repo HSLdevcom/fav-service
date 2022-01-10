@@ -189,6 +189,7 @@ const putFavoritesTrigger: AzureFunction = async function (
       currentFavorites,
       req.body,
       String(store),
+      type,
     );
     await expireNotes(context, dataStorage.id, mergedFavorites);
     context.log('updating favorites to datastorage');

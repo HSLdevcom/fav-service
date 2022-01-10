@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuidv4_1 = require("uuidv4");
-function mergeFavorites(currentFavorites, newFavorites, store) {
+const filterFavorites_1 = require("./filterFavorites");
+function mergeFavorites(currentFavorites, newFavorites, store, type = undefined) {
     const newData = {};
     const currentData = Object.values(currentFavorites).filter(elem => elem);
     const prefix = store ? `${store}-` : '';
@@ -40,8 +41,8 @@ function mergeFavorites(currentFavorites, newFavorites, store) {
             newData[`${prefix}${newFavorite.favouriteId}`] = newFavorite;
         }
     });
-    const newKeys = Object.keys(newData);
-    const oldKeys = Object.keys(currentFavorites);
+    const newKeys = Object.keys(filterFavorites_1.default(newData, type));
+    const oldKeys = Object.keys(filterFavorites_1.default(currentFavorites));
     // Reorder favorites
     if (oldKeys.every(key => newKeys.includes(key))) {
         return newData;
