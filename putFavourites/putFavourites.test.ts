@@ -915,4 +915,59 @@ describe('putFavourites', () => {
       );
     });
   });
+  describe('put favourites with new order of favourites', () => {
+    beforeEach(() => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+    });
+    it('should reorder favourites', async () => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockData);
+      const favourites = Object.values(mockData);
+      const newOrder = [...favourites.slice(1), favourites[0]];
+
+      const request = {
+        ...baseRequest,
+        body: newOrder,
+      };
+
+      await putFavourites(context, request);
+
+      const body = JSON.parse(context?.res?.body);
+
+      expect(context?.res?.status).toEqual(200);
+      expect(body.slice(-1)[0]).toEqual(favourites[0]);
+    });
+    it('should reorder favourites when there are also non default typed favourite saved', async () => {
+      const postalCodeFav = {
+        'fav-df8170a2-6c20-4267-a1df-05f89d6926bd': {
+          postalCode: '00100',
+          type: 'postalCode',
+          lastUpdated: 1620732626,
+          favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+        },
+      };
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, { ...mockData, ...postalCodeFav });
+      const favourites = Object.values(mockData);
+      const newOrder = [...favourites.slice(1), favourites[0]];
+      const request = {
+        ...baseRequest,
+        body: newOrder,
+      };
+
+      await putFavourites(context, request);
+      const body = JSON.parse(context?.res?.body);
+
+      expect(context?.res?.status).toEqual(200);
+      expect(body.slice(-1)[0]).toEqual(favourites[0]);
+    });
+  });
 });
