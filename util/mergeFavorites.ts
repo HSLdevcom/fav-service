@@ -1,5 +1,6 @@
 import { uuid } from 'uuidv4';
 import { Favourite, Favourites } from './types';
+import filterFavorites from './filterFavorites';
 
 export default function mergeFavorites(
   currentFavorites: Favourites,
@@ -44,11 +45,22 @@ export default function mergeFavorites(
       newData[`${prefix}${newFavorite.favouriteId}`] = newFavorite;
     }
   });
+  const filteredNewKeys = Object.keys(filterFavorites(newData));
+  const filteredOldKeys = Object.keys(filterFavorites(currentFavorites));
   const newKeys = Object.keys(newData);
   const oldKeys = Object.keys(currentFavorites);
+  const reordered: Favourites = {};
   // Reorder favorites
-  if (oldKeys.every(key => newKeys.includes(key))) {
-    return newData;
+  if (filteredOldKeys.every(key => filteredNewKeys.includes(key))) {
+    newKeys.forEach(key => {
+      reordered[key] = newData[key];
+    });
+    oldKeys.forEach(key => {
+      if (!Object.keys(reordered).includes(key)) {
+        reordered[key] = currentFavorites[key];
+      }
+    });
+    return reordered;
   }
   return Object.assign(currentFavorites, newData);
 }
