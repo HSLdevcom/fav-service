@@ -9,4 +9,5 @@ var FavouriteType;
     FavouriteType[FavouriteType["place"] = 3] = "place";
     FavouriteType[FavouriteType["bikeStation"] = 4] = "bikeStation";
     FavouriteType[FavouriteType["note"] = 5] = "note";
+    FavouriteType[FavouriteType["postalCode"] = 6] = "postalCode";
 })(FavouriteType = exports.FavouriteType || (exports.FavouriteType = {}));

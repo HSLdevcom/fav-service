@@ -7,6 +7,7 @@ export enum FavouriteType {
   'place',
   'bikeStation',
   'note',
+  'postalCode',
 }
 
 export interface Favourite {
