@@ -6,10 +6,11 @@ const filterFavorites = (favorites, type = undefined) => {
     const responseArray = keys.map((key) => {
         return Object(favorites)[key];
     });
+    const defaultTypes = ['route', 'stop', 'station', 'place', 'bikeStation'];
     const filteredArray = responseArray.filter(item => {
         const itemType = String(item.type);
         if (item &&
-            ((!types && !['note', 'postalCode'].includes(itemType)) ||
+            ((!types && defaultTypes.includes(itemType)) ||
                 (types && (types === null || types === void 0 ? void 0 : types.includes(itemType))))) {
             return true;
         }
