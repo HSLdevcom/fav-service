@@ -53,21 +53,25 @@ export const getDataStorage = async (
 export const createDataStorage = async (
   id: string | undefined,
 ): Promise<string> => {
-  const managementClientId = getManagementClientId();
-  const options: HsldIdOptions = {
-    method: 'POST',
-    endpoint: `/api/rest/v1/datastorage`,
-    data: {
-      name: `favorites-${managementClientId || ''}`,
-      description: 'Suosikit',
-      ownerId: id,
-      adminAccess: [managementClientId],
-      readAccess: [managementClientId, id],
-      writeAccess: [managementClientId, id],
-    },
-  };
-  const response = await makeHslIdRequest(options);
-  return response.data.id;
+  try {
+    const managementClientId = getManagementClientId();
+    const options: HsldIdOptions = {
+      method: 'POST',
+      endpoint: `/api/rest/v1/datastorage`,
+      data: {
+        name: `favorites-${managementClientId || ''}`,
+        description: 'Suosikit',
+        ownerId: id,
+        adminAccess: [managementClientId],
+        readAccess: [managementClientId, id],
+        writeAccess: [managementClientId, id],
+      },
+    };
+    const response = await makeHslIdRequest(options);
+    return response.data.id;
+  } catch (err) {
+    throw new Err(500, `Creating datastorage failed`);
+  }
 };
 
 export const getFavorites = async (
@@ -90,13 +94,17 @@ export const updateFavorites = async (
   dsId: string | undefined,
   favorites: Favourites,
 ): Promise<AxiosResponse> => {
-  const options: HsldIdOptions = {
-    method: 'PUT',
-    endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
-    data: favorites,
-  };
-  const response = await makeHslIdRequest(options);
-  return response;
+  try {
+    const options: HsldIdOptions = {
+      method: 'PUT',
+      endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
+      data: favorites,
+    };
+    const response = await makeHslIdRequest(options);
+    return response;
+  } catch (err) {
+    throw new Err(500, `Updating datastorage failed`);
+  }
 };
 
 export const deleteFavorites = async (

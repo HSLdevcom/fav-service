@@ -52,21 +52,26 @@ const getDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getDataStorage = getDataStorage;
 const createDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const managementClientId = helpers_1.getManagementClientId();
-    const options = {
-        method: 'POST',
-        endpoint: `/api/rest/v1/datastorage`,
-        data: {
-            name: `favorites-${managementClientId || ''}`,
-            description: 'Suosikit',
-            ownerId: id,
-            adminAccess: [managementClientId],
-            readAccess: [managementClientId, id],
-            writeAccess: [managementClientId, id],
-        },
-    };
-    const response = yield makeHslIdRequest(options);
-    return response.data.id;
+    try {
+        const managementClientId = helpers_1.getManagementClientId();
+        const options = {
+            method: 'POST',
+            endpoint: `/api/rest/v1/datastorage`,
+            data: {
+                name: `favorites-${managementClientId || ''}`,
+                description: 'Suosikit',
+                ownerId: id,
+                adminAccess: [managementClientId],
+                readAccess: [managementClientId, id],
+                writeAccess: [managementClientId, id],
+            },
+        };
+        const response = yield makeHslIdRequest(options);
+        return response.data.id;
+    }
+    catch (err) {
+        throw new Err_1.default(500, `Creating datastorage failed`);
+    }
 });
 exports.createDataStorage = createDataStorage;
 const getFavorites = (dsId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -85,13 +90,18 @@ const getFavorites = (dsId) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getFavorites = getFavorites;
 const updateFavorites = (dsId, favorites) => __awaiter(void 0, void 0, void 0, function* () {
-    const options = {
-        method: 'PUT',
-        endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
-        data: favorites,
-    };
-    const response = yield makeHslIdRequest(options);
-    return response;
+    try {
+        const options = {
+            method: 'PUT',
+            endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
+            data: favorites,
+        };
+        const response = yield makeHslIdRequest(options);
+        return response;
+    }
+    catch (err) {
+        throw new Err_1.default(500, `Updating datastorage failed`);
+    }
 });
 exports.updateFavorites = updateFavorites;
 const deleteFavorites = (dsId, keys, store) => __awaiter(void 0, void 0, void 0, function* () {
