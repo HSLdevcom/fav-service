@@ -1,6 +1,6 @@
 # Favorites microservice
 
-## Local environment
+## Local environment 
 
 ### Dependencies
 
