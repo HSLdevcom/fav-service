@@ -53,8 +53,6 @@ const getFavoritesTrigger: AzureFunction = async function (
     redisOptions,
   );
 
-  client.foo.bar= tree; // this is bug
-
   const key = String(store ? `${store}-${userId}` : userId);
 
   let cache!: Cache;
@@ -71,7 +69,6 @@ const getFavoritesTrigger: AzureFunction = async function (
         reject();
       });
     });
-
   try {
     // redis check cache
     context.log('checking redis cache');
