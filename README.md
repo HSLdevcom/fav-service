@@ -81,7 +81,6 @@ Defines what types of favourites to return. Favourite types separated by comma. 
 
 ### Data model
 
-
 1. route
 
 ```
