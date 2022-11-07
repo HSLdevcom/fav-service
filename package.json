@@ -49,7 +49,6 @@
     "start": "func start",
     "watch": "tsc -w",
     "lint": "eslint .",
-    "test": "jest",
-    "prepare": "husky install"
+    "test": "jest"
   }
 }
