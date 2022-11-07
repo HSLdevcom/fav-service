@@ -7,6 +7,12 @@
   "author": "Krister Bäckman <krister.backman@digia.com>",
   "license": "MIT",
   "private": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint",
+      "pre-push": "yarn test"
+    }
+  },
   "dependencies": {
     "ajv": "8.6.3",
     "ajv-formats": "2.1.1",
