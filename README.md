@@ -45,6 +45,12 @@ FAVORITES_HOST is used in proxies.json to emulate rest api structure. For exampl
 yarn start
 ```
 
+### Running tests
+
+```bash
+yarn test
+```
+
 ### How to use
 
 Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}` in development environment.
