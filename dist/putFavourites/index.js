@@ -9,13 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Redis = require("ioredis");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
 const mergeFavorites_1 = require("../util/mergeFavorites");
 const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
+const ioredis_1 = require("ioredis");
 const updateSchema = {
     type: 'object',
     properties: {
@@ -190,7 +190,7 @@ const putFavoritesTrigger = function (context, req) {
                     tls: { servername: settings.redisHost },
                 }
                 : {};
-            const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
+            const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
             const waitForRedis = (client) => __awaiter(this, void 0, void 0, function* () {
                 yield client.set(key, JSON.stringify(cache.data), 'EX', 60 * 60 * 24 * 14);
                 yield client.quit();

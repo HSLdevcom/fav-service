@@ -1,6 +1,5 @@
 import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
-import * as Redis from 'ioredis';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
 import { RedisSettings, DeleteSchema } from '../util/types';
@@ -8,6 +7,7 @@ import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { deleteFavorites, getDataStorage, getFavorites } from '../agent/Agent';
 import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
+import Redis from 'ioredis';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
   type: 'object',
@@ -69,12 +69,12 @@ const deleteFavouriteTrigger: AzureFunction = async function (
           tls: { servername: settings.redisHost },
         }
       : {};
-    const client = new Redis(
-      settings.redisPort,
-      settings.redisHost,
-      redisOptions,
-    );
-    const waitForRedis = (client: Redis.Redis): Promise<void> =>
+    const client = new Redis({
+      port: settings.redisPort,
+      host: settings.redisHost,
+      ...redisOptions,
+    });
+    const waitForRedis = (client: Redis): Promise<void> =>
       new Promise((resolve, reject) => {
         client.on('ready', async () => {
           context.log('redis connected');

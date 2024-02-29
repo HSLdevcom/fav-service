@@ -1,5 +1,4 @@
 import { JSONSchemaType } from 'ajv';
-import * as Redis from 'ioredis';
 import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
@@ -15,6 +14,7 @@ import {
 import mergeFavorites from '../util/mergeFavorites';
 import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
+import Redis from 'ioredis';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -201,12 +201,12 @@ const putFavoritesTrigger: AzureFunction = async function (
           tls: { servername: settings.redisHost },
         }
       : {};
-    const client = new Redis(
-      settings.redisPort,
-      settings.redisHost,
-      redisOptions,
-    );
-    const waitForRedis = async (client: Redis.Redis) => {
+    const client = new Redis({
+      port: settings.redisPort,
+      host: settings.redisHost,
+      ...redisOptions,
+    });
+    const waitForRedis = async (client: Redis) => {
       await client.set(
         key,
         JSON.stringify(cache.data),
