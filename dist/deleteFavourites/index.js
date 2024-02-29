@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Redis = require("ioredis");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
 const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
+const ioredis_1 = require("ioredis");
 const deleteSchema = {
     type: 'object',
     properties: {
@@ -70,7 +70,7 @@ const deleteFavouriteTrigger = function (context, req) {
                     tls: { servername: settings.redisHost },
                 }
                 : {};
-            const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
+            const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
             const waitForRedis = (client) => new Promise((resolve, reject) => {
                 client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
                     context.log('redis connected');

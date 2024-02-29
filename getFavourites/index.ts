@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import * as Redis from 'ioredis';
 import { JSONSchemaType } from 'ajv';
 import { RedisSettings, Cache, GetSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
@@ -8,6 +7,7 @@ import createErrorResponse from '../util/createErrorResponse';
 import { getDataStorage, getFavorites } from '../agent/Agent';
 import { getRedisHost, getRedisPort, getRedisPass } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
+import Redis from 'ioredis';
 
 const getSchema: JSONSchemaType<GetSchema> = {
   type: 'object',
@@ -47,15 +47,16 @@ const getFavoritesTrigger: AzureFunction = async function (
   const redisOptions = settings.redisPass
     ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
     : {};
-  const client = new Redis(
-    settings.redisPort,
-    settings.redisHost,
-    redisOptions,
-  );
+  const client = new Redis({
+    port: settings.redisPort,
+    host: settings.redisHost,
+    ...redisOptions,
+  });
+
   const key = String(store ? `${store}-${userId}` : userId);
 
   let cache!: Cache;
-  const waitForRedis = (client: Redis.Redis): Promise<void> =>
+  const waitForRedis = (client: Redis): Promise<void> =>
     new Promise((resolve, reject) => {
       client.on('ready', async () => {
         context.log('redis connected');
