@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const createErrorResponse = (error, context) => {
     context.log(error);
-    if (error.message === 'DataStorage not found') {
+    if ((error === null || error === void 0 ? void 0 : error.message) === 'DataStorage not found') {
         context.log('no datastorage found, returning empty array');
         const response = {
             body: JSON.stringify([]),
