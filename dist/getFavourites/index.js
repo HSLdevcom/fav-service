@@ -9,13 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-const Redis = require("ioredis");
 const validator_1 = require("../util/validator");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const Agent_1 = require("../agent/Agent");
 const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
+const ioredis_1 = require("ioredis");
 const getSchema = {
     type: 'object',
     properties: {
@@ -53,7 +52,7 @@ const getFavoritesTrigger = function (context, req) {
         const redisOptions = settings.redisPass
             ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
             : {};
-        const client = new Redis(settings.redisPort, settings.redisHost, redisOptions);
+        const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
         const key = String(store ? `${store}-${userId}` : userId);
         let cache;
         const waitForRedis = (client) => new Promise((resolve, reject) => {
