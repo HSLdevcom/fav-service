@@ -13,7 +13,7 @@ interface ErrorResponse {
 const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
   context.log(error);
 
-  if (error.message === 'DataStorage not found') {
+  if (error?.message === 'DataStorage not found') {
     context.log('no datastorage found, returning empty array');
     const response: ErrorResponse = {
       body: JSON.stringify([]),
