@@ -50,7 +50,7 @@ const getFavoritesTrigger: AzureFunction = async function (
   const client = new Redis({
     port: settings.redisPort,
     host: settings.redisHost,
-    connectTimeOut: 5000,
+    connectTimeout: 5000,
     ...redisOptions,
   });
 

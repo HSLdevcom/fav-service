@@ -52,7 +52,7 @@ const getFavoritesTrigger = function (context, req) {
         const redisOptions = settings.redisPass
             ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
             : {};
-        const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
+        const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost, connectTimeout: 5000 }, redisOptions));
         const key = String(store ? `${store}-${userId}` : userId);
         let cache;
         const waitForRedis = (client) => new Promise((resolve, reject) => {
