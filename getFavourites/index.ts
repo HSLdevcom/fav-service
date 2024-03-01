@@ -65,7 +65,8 @@ const getFavoritesTrigger: AzureFunction = async function (
         resolve();
       });
       client.on('error', async err => {
-        context.log('redis error', err);
+        context.log('redis error');
+	context.log(err);
         reject();
       });
     });
