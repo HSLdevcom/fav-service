@@ -62,8 +62,9 @@ const getFavoritesTrigger = function (context, req) {
                 cache = { data: JSON.parse(data) };
                 resolve();
             }));
-            client.on('error', () => __awaiter(this, void 0, void 0, function* () {
+            client.on('error', (err) => __awaiter(this, void 0, void 0, function* () {
                 context.log('redis error');
+                context.log(err);
                 reject();
             }));
         });
