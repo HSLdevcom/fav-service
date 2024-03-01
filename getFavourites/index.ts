@@ -64,8 +64,8 @@ const getFavoritesTrigger: AzureFunction = async function (
         cache = { data: JSON.parse(data) };
         resolve();
       });
-      client.on('error', async () => {
-        context.log('redis error');
+      client.on('error', async err => {
+        context.log('redis error', err);
         reject();
       });
     });
