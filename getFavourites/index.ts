@@ -72,11 +72,13 @@ const getFavoritesTrigger: AzureFunction = async function (
       });
     });
   try {
-    // redis check cache
     context.log('checking redis cache');
-
     await waitForRedis(client);
+  } catch (err) {
+    context.log(err); // redis IO errror - not fatal, just log it
+  }
 
+  try {
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
@@ -85,9 +87,15 @@ const getFavoritesTrigger: AzureFunction = async function (
       const favorites = await getFavorites(dataStorage.id);
       const filteredFavorites = filterFavorites(favorites, type);
       const json = JSON.stringify(filteredFavorites);
-      // cache data
-      context.log('caching data');
-      await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
+      if (cache) {
+        context.log('caching data');
+        await client.set(
+          key,
+          JSON.stringify(favorites),
+          'EX',
+          60 * 60 * 24 * 14,
+        );
+      }
       context.res = {
         status: 200,
         body: json,
@@ -107,11 +115,10 @@ const getFavoritesTrigger: AzureFunction = async function (
         },
       };
     }
-    client.quit();
   } catch (err) {
-    client.quit();
     context.res = createErrorResponse(err, context);
   }
+  client.quit();
 };
 
 export default getFavoritesTrigger;

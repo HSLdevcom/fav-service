@@ -63,35 +63,38 @@ const deleteFavouriteTrigger: AzureFunction = async function (
         statusText: hslidResponses[i]?.statusText,
       };
     });
-    // redis delete key from cache
-    const redisOptions = settings.redisPass
-      ? {
-          password: settings.redisPass,
-          tls: { servername: settings.redisHost },
-        }
-      : {};
-    const client = new Redis({
-      port: settings.redisPort,
-      host: settings.redisHost,
-      connectTimeout: 2500,
-      ...redisOptions,
-    });
-    const waitForRedis = (client: Redis): Promise<void> =>
-      new Promise((resolve, reject) => {
-        client.on('ready', async () => {
-          context.log('redis connected');
-          await client.expire(String(key), 0);
-          client.quit();
-          resolve();
-        });
-        client.on('error', async () => {
-          context.log('redis error');
-          client.quit();
-          reject();
-        });
+    try {
+      // redis delete key from cache
+      const redisOptions = settings.redisPass
+        ? {
+            password: settings.redisPass,
+            tls: { servername: settings.redisHost },
+          }
+        : {};
+      const client = new Redis({
+        port: settings.redisPort,
+        host: settings.redisHost,
+        connectTimeout: 2500,
+        ...redisOptions,
       });
-    await waitForRedis(client);
-
+      const waitForRedis = (client: Redis): Promise<void> =>
+        new Promise((resolve, reject) => {
+          client.on('ready', async () => {
+            context.log('redis connected');
+            await client.expire(String(key), 0);
+            client.quit();
+            resolve();
+          });
+          client.on('error', async () => {
+            context.log('redis error');
+            client.quit();
+            reject();
+          });
+        });
+      await waitForRedis(client);
+    } catch (err) {
+      context.log(err); // redis IO error
+    }
     const deleteSuccessful = responses.every(
       (response: AxiosResponse) => response.status === 204,
     );

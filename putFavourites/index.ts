@@ -200,30 +200,34 @@ const putFavoritesTrigger: AzureFunction = async function (
       mergedFavorites,
       context,
     );
-    const cache: Cache = { data: mergedFavorites };
-    // update data to redis with hslid key
-    const redisOptions = settings.redisPass
-      ? {
-          password: settings.redisPass,
-          tls: { servername: settings.redisHost },
-        }
-      : {};
-    const client = new Redis({
-      port: settings.redisPort,
-      host: settings.redisHost,
-      connectTimeout: 2500,
-      ...redisOptions,
-    });
-    const waitForRedis = async (client: Redis) => {
-      await client.set(
-        key,
-        JSON.stringify(cache.data),
-        'EX',
-        60 * 60 * 24 * 14,
-      );
-      await client.quit();
-    };
-    await waitForRedis(client);
+    try {
+      const cache: Cache = { data: mergedFavorites };
+      // update da ta to redis with hslid key
+      const redisOptions = settings.redisPass
+        ? {
+            password: settings.redisPass,
+            tls: { servername: settings.redisHost },
+          }
+        : {};
+      const client = new Redis({
+        port: settings.redisPort,
+        host: settings.redisHost,
+        connectTimeout: 2500,
+        ...redisOptions,
+      });
+      const waitForRedis = async (client: Redis) => {
+        await client.set(
+          key,
+          JSON.stringify(cache.data),
+          'EX',
+          60 * 60 * 24 * 14,
+        );
+        await client.quit();
+      };
+      await waitForRedis(client);
+    } catch (err) {
+      context.log(err); // redis IO error
+    }
     const filteredFavorites = filterFavorites(mergedFavorites, type);
     const statusCode = response.status === 204 ? 200 : response.status;
     const responseBody: string = JSON.stringify(
