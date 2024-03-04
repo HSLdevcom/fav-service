@@ -72,6 +72,7 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     const client = new Redis({
       port: settings.redisPort,
       host: settings.redisHost,
+      connectTimeout: 2500,
       ...redisOptions,
     });
     const waitForRedis = (client: Redis): Promise<void> =>
