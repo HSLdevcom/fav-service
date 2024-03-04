@@ -51,6 +51,15 @@ yarn start
 yarn test
 ```
 
+### Build runtime distribution
+
+Editing source code files such as getFavourites/index.ts does not change the deployed service. You must build the project first:
+
+```bash
+yarn build
+git commit dist
+```
+
 ### How to use
 
 Requests are done to endpoint `https://dev-api.digitransit.fi/favourites/{user's_hsl_id}` in development environment.
