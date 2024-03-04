@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const validator_1 = require("../util/validator");
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const Agent_1 = require("../agent/Agent");
-const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
-const ioredis_1 = require("ioredis");
+const redisClient_1 = require("../util/redisClient");
 const getSchema = {
     type: 'object',
     properties: {
@@ -31,7 +30,6 @@ const getSchema = {
 const getFavoritesTrigger = function (context, req) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        const settings = {};
         const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
         const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
         const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
@@ -41,46 +39,31 @@ const getFavoritesTrigger = function (context, req) {
                 store: store,
             };
             validator_1.default(getSchema, schema);
-            settings.redisHost = helpers_1.getRedisHost();
-            settings.redisPort = helpers_1.getRedisPort();
-            settings.redisPass = helpers_1.getRedisPass();
         }
         catch (err) {
             context.res = createErrorResponse_1.default(err, context);
             return;
         }
-        const redisOptions = settings.redisPass
-            ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
-            : {};
-        const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost, connectTimeout: 5000 }, redisOptions));
         const key = String(store ? `${store}-${userId}` : userId);
         let cache;
-        const waitForRedis = (client) => new Promise((resolve, reject) => {
-            client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
-                context.log('redis connected');
-                const data = String(yield client.get(key));
-                cache = { data: JSON.parse(data) };
-                resolve();
-            }));
-            client.on('error', (err) => __awaiter(this, void 0, void 0, function* () {
-                context.log('redis error');
-                context.log(err);
-                reject();
-            }));
-        });
+        const client = redisClient_1.default();
         try {
-            // redis check cache
             context.log('checking redis cache');
-            yield waitForRedis(client);
+            const data = String(yield client.get(key));
+            cache = { data: JSON.parse(data) };
+        }
+        catch (err) {
+            context.log(err); // redis IO error - not fatal, just log
+        }
+        try {
             if (!cache || cache.data === null) {
                 context.log('no data in cache');
                 context.log('getting dataStorage');
-                const dataStorage = yield Agent_1.getDataStorage(req.params.id);
+                const dataStorage = yield Agent_1.getDataStorage(req.params.id, context);
                 context.log('found datastorage');
                 const favorites = yield Agent_1.getFavorites(dataStorage.id);
                 const filteredFavorites = filterFavorites_1.default(favorites, type);
                 const json = JSON.stringify(filteredFavorites);
-                // cache data
                 context.log('caching data');
                 yield client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
                 context.res = {
@@ -103,10 +86,8 @@ const getFavoritesTrigger = function (context, req) {
                     },
                 };
             }
-            client.quit();
         }
         catch (err) {
-            client.quit();
             context.res = createErrorResponse_1.default(err, context);
         }
     });

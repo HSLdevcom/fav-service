@@ -27,7 +27,7 @@ const makeHslIdRequest = (options) => __awaiter(void 0, void 0, void 0, function
     const response = yield axios_1.default(options);
     return response;
 });
-const getDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const getDataStorage = (id, context) => __awaiter(void 0, void 0, void 0, function* () {
     const managementClientId = helpers_1.getManagementClientId();
     const options = {
         method: 'GET',
@@ -43,15 +43,16 @@ const getDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* () {
             return dataStorage;
         }
         else {
-            throw new Err_1.default(404, 'DataStorage not found');
+            throw new Err_1.default(404, 'User has no datastorage');
         }
     }
-    catch (error) {
-        throw new Err_1.default(404, 'DataStorage not found');
+    catch (err) {
+        context.log(err);
+        throw new Err_1.default(404, 'Could not get datastorage');
     }
 });
 exports.getDataStorage = getDataStorage;
-const createDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const createDataStorage = (id, context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const managementClientId = helpers_1.getManagementClientId();
         const options = {
@@ -70,6 +71,7 @@ const createDataStorage = (id) => __awaiter(void 0, void 0, void 0, function* ()
         return response.data.id;
     }
     catch (err) {
+        context.log(err);
         throw new Err_1.default(500, `Creating datastorage failed`);
     }
 });
@@ -89,7 +91,7 @@ const getFavorites = (dsId) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getFavorites = getFavorites;
-const updateFavorites = (dsId, favorites) => __awaiter(void 0, void 0, void 0, function* () {
+const updateFavorites = (dsId, favorites, context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const options = {
             method: 'PUT',
@@ -100,11 +102,12 @@ const updateFavorites = (dsId, favorites) => __awaiter(void 0, void 0, void 0, f
         return response;
     }
     catch (err) {
+        context.log(err);
         throw new Err_1.default(500, `Updating datastorage failed`);
     }
 });
 exports.updateFavorites = updateFavorites;
-const deleteFavorites = (dsId, keys, store) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteFavorites = (dsId, keys, store, context) => __awaiter(void 0, void 0, void 0, function* () {
     const responses = [];
     for (let i = 0; i < keys.length; i++) {
         try {
@@ -116,13 +119,14 @@ const deleteFavorites = (dsId, keys, store) => __awaiter(void 0, void 0, void 0,
             responses.push(yield makeHslIdRequest(options));
         }
         catch (err) {
+            context.log(err);
             responses.push(err);
         }
     }
     return responses;
 });
 exports.deleteFavorites = deleteFavorites;
-const deleteExpiredNotes = (dsId, favorites) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteExpiredNotes = (dsId, favorites, context) => __awaiter(void 0, void 0, void 0, function* () {
     let responses = [];
     const expired = [];
     const keys = Object.keys(favorites);
@@ -134,7 +138,7 @@ const deleteExpiredNotes = (dsId, favorites) => __awaiter(void 0, void 0, void 0
             delete favorites[key];
         }
     });
-    responses = yield exports.deleteFavorites(dsId, expired, undefined);
+    responses = yield exports.deleteFavorites(dsId, expired, undefined, context);
     return responses;
 });
 exports.deleteExpiredNotes = deleteExpiredNotes;

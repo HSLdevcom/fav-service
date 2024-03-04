@@ -13,9 +13,8 @@ const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
 const mergeFavorites_1 = require("../util/mergeFavorites");
-const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
-const ioredis_1 = require("ioredis");
+const redisClient_1 = require("../util/redisClient");
 const updateSchema = {
     type: 'object',
     properties: {
@@ -116,7 +115,7 @@ const expireNotes = (context, dsId, favorites) => __awaiter(void 0, void 0, void
         return;
     }
     context.log('delete expired notes');
-    const deleteResponses = yield Agent_1.deleteExpiredNotes(dsId, favorites);
+    const deleteResponses = yield Agent_1.deleteExpiredNotes(dsId, favorites, context);
     if (deleteResponses.length > 0) {
         const deleteSuccessful = deleteResponses.every((response) => response.status === 204);
         if (deleteSuccessful) {
@@ -131,10 +130,6 @@ const putFavoritesTrigger = function (context, req) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const settings = {};
-            settings.redisHost = helpers_1.getRedisHost();
-            settings.redisPort = helpers_1.getRedisPort();
-            settings.redisPass = helpers_1.getRedisPass();
             const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
             const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
             const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
@@ -149,7 +144,7 @@ const putFavoritesTrigger = function (context, req) {
             };
             try {
                 context.log('searching existing datastorage');
-                const oldDataStorage = yield Agent_1.getDataStorage(req.params.id);
+                const oldDataStorage = yield Agent_1.getDataStorage(req.params.id, context);
                 context.log('existing datastorage found');
                 dataStorage.id = oldDataStorage.id;
             }
@@ -159,7 +154,7 @@ const putFavoritesTrigger = function (context, req) {
                     context.log('datastorage not found');
                     try {
                         context.log('trying to create new datastorage');
-                        const newDataStorage = yield Agent_1.createDataStorage(req.params.id);
+                        const newDataStorage = yield Agent_1.createDataStorage(req.params.id, context);
                         context.log('datastorage created');
                         dataStorage.id = newDataStorage;
                     }
@@ -181,21 +176,16 @@ const putFavoritesTrigger = function (context, req) {
             const mergedFavorites = yield mergeFavorites_1.default(currentFavorites, req.body, String(store));
             yield expireNotes(context, dataStorage.id, mergedFavorites);
             context.log('updating favorites to datastorage');
-            const response = yield Agent_1.updateFavorites(dataStorage.id, mergedFavorites);
-            const cache = { data: mergedFavorites };
-            // update data to redis with hslid key
-            const redisOptions = settings.redisPass
-                ? {
-                    password: settings.redisPass,
-                    tls: { servername: settings.redisHost },
-                }
-                : {};
-            const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
-            const waitForRedis = (client) => __awaiter(this, void 0, void 0, function* () {
+            const response = yield Agent_1.updateFavorites(dataStorage.id, mergedFavorites, context);
+            try {
+                const cache = { data: mergedFavorites };
+                // update data to redis with hslid key
+                const client = redisClient_1.default();
                 yield client.set(key, JSON.stringify(cache.data), 'EX', 60 * 60 * 24 * 14);
-                yield client.quit();
-            });
-            yield waitForRedis(client);
+            }
+            catch (err) {
+                context.log(err); // redis IO error
+            }
             const filteredFavorites = filterFavorites_1.default(mergedFavorites, type);
             const statusCode = response.status === 204 ? 200 : response.status;
             const responseBody = JSON.stringify(Object.values(filteredFavorites));
