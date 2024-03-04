@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createErrorResponse_1 = require("../util/createErrorResponse");
 const validator_1 = require("../util/validator");
 const Agent_1 = require("../agent/Agent");
-const helpers_1 = require("../util/helpers");
 const filterFavorites_1 = require("../util/filterFavorites");
-const ioredis_1 = require("ioredis");
+const redisClient_1 = require("../util/redisClient");
 const deleteSchema = {
     type: 'object',
     properties: {
@@ -36,10 +35,6 @@ const deleteFavouriteTrigger = function (context, req) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const settings = {};
-            settings.redisHost = helpers_1.getRedisHost();
-            settings.redisPort = helpers_1.getRedisPort();
-            settings.redisPass = helpers_1.getRedisPass();
             const userId = (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.id;
             const store = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.store;
             const type = (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.type;
@@ -51,9 +46,9 @@ const deleteFavouriteTrigger = function (context, req) {
             validator_1.default(deleteSchema, schema);
             const key = store ? `${store}-${req.params.id}` : req.params.id;
             context.log('getting dataStorage');
-            const dataStorage = yield Agent_1.getDataStorage(req.params.id);
+            const dataStorage = yield Agent_1.getDataStorage(req.params.id, context);
             context.log('deleting items');
-            const hslidResponses = yield Agent_1.deleteFavorites(dataStorage.id, req === null || req === void 0 ? void 0 : req.body, store);
+            const hslidResponses = yield Agent_1.deleteFavorites(dataStorage.id, req === null || req === void 0 ? void 0 : req.body, store, context);
             context.log('deleted items');
             const responses = req.body.map((key, i) => {
                 var _a, _b;
@@ -63,28 +58,14 @@ const deleteFavouriteTrigger = function (context, req) {
                     statusText: (_b = hslidResponses[i]) === null || _b === void 0 ? void 0 : _b.statusText,
                 };
             });
-            // redis delete key from cache
-            const redisOptions = settings.redisPass
-                ? {
-                    password: settings.redisPass,
-                    tls: { servername: settings.redisHost },
-                }
-                : {};
-            const client = new ioredis_1.default(Object.assign({ port: settings.redisPort, host: settings.redisHost }, redisOptions));
-            const waitForRedis = (client) => new Promise((resolve, reject) => {
-                client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
-                    context.log('redis connected');
-                    yield client.expire(String(key), 0);
-                    client.quit();
-                    resolve();
-                }));
-                client.on('error', () => __awaiter(this, void 0, void 0, function* () {
-                    context.log('redis error');
-                    client.quit();
-                    reject();
-                }));
-            });
-            yield waitForRedis(client);
+            try {
+                // redis delete key from cache
+                const client = redisClient_1.default();
+                yield client.expire(String(key), 0);
+            }
+            catch (err) {
+                context.log(err); // redis IO error
+            }
             const deleteSuccessful = responses.every((response) => response.status === 204);
             const favorites = yield Agent_1.getFavorites(dataStorage.id);
             const filteredFavorites = filterFavorites_1.default(favorites, type);

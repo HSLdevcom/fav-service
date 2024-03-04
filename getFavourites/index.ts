@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { JSONSchemaType } from 'ajv';
-import { RedisSettings, Cache, GetSchema } from '../util/types';
+import { Cache, GetSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
 import createErrorResponse from '../util/createErrorResponse';
 import { getDataStorage, getFavorites } from '../agent/Agent';
-import { getRedisHost, getRedisPort, getRedisPass } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
-import Redis from 'ioredis';
+import getClient from '../util/redisClient';
 
 const getSchema: JSONSchemaType<GetSchema> = {
   type: 'object',
@@ -27,7 +26,6 @@ const getFavoritesTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest,
 ): Promise<void> {
-  const settings: RedisSettings = {};
   const userId = req?.params?.id;
   const store = req?.query?.store;
   const type = req?.query?.type;
@@ -37,55 +35,32 @@ const getFavoritesTrigger: AzureFunction = async function (
       store: store,
     };
     validate(getSchema, schema);
-    settings.redisHost = getRedisHost();
-    settings.redisPort = getRedisPort();
-    settings.redisPass = getRedisPass();
   } catch (err) {
     context.res = createErrorResponse(err, context);
     return;
   }
-  const redisOptions = settings.redisPass
-    ? { password: settings.redisPass, tls: { servername: settings.redisHost } }
-    : {};
-  const client = new Redis({
-    port: settings.redisPort,
-    host: settings.redisHost,
-    connectTimeout: 2500,
-    ...redisOptions,
-  });
 
   const key = String(store ? `${store}-${userId}` : userId);
-
   let cache!: Cache;
-  const waitForRedis = (client: Redis): Promise<void> =>
-    new Promise((resolve, reject) => {
-      client.on('ready', async () => {
-        context.log('redis connected');
-        const data = String(await client.get(key));
-        cache = { data: JSON.parse(data) };
-        resolve();
-      });
-      client.on('error', async err => {
-        context.log('redis error');
-        context.log(err);
-        reject();
-      });
-    });
+
+  const client = getClient();
   try {
-    // redis check cache
     context.log('checking redis cache');
+    const data = String(await client.get(key));
+    cache = { data: JSON.parse(data) };
+  } catch (err) {
+    context.log(err); // redis IO error - not fatal, just log
+  }
 
-    await waitForRedis(client);
-
+  try {
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
-      const dataStorage = await getDataStorage(req.params.id);
+      const dataStorage = await getDataStorage(req.params.id, context);
       context.log('found datastorage');
       const favorites = await getFavorites(dataStorage.id);
       const filteredFavorites = filterFavorites(favorites, type);
       const json = JSON.stringify(filteredFavorites);
-      // cache data
       context.log('caching data');
       await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
       context.res = {
@@ -107,9 +82,7 @@ const getFavoritesTrigger: AzureFunction = async function (
         },
       };
     }
-    client.quit();
   } catch (err) {
-    client.quit();
     context.res = createErrorResponse(err, context);
   }
 };

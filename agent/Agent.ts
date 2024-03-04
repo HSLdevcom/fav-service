@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import axios, { AxiosResponse } from 'axios';
+import { Context } from '@azure/functions';
 import {
   getHslIdUrl,
   getManagementClientCredentials,
@@ -26,6 +27,7 @@ const makeHslIdRequest = async (
 
 export const getDataStorage = async (
   id: string | undefined,
+  context: Context,
 ): Promise<{ [key: string]: string }> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
@@ -43,15 +45,17 @@ export const getDataStorage = async (
     if (dataStorage) {
       return dataStorage;
     } else {
-      throw new Err(404, 'DataStorage not found');
+      throw new Err(404, 'User has no datastorage');
     }
-  } catch (error) {
-    throw new Err(404, 'DataStorage not found');
+  } catch (err) {
+    context.log(err);
+    throw new Err(404, 'Could not get datastorage');
   }
 };
 
 export const createDataStorage = async (
   id: string | undefined,
+  context: Context,
 ): Promise<string> => {
   try {
     const managementClientId = getManagementClientId();
@@ -70,6 +74,7 @@ export const createDataStorage = async (
     const response = await makeHslIdRequest(options);
     return response.data.id;
   } catch (err) {
+    context.log(err);
     throw new Err(500, `Creating datastorage failed`);
   }
 };
@@ -93,6 +98,7 @@ export const getFavorites = async (
 export const updateFavorites = async (
   dsId: string | undefined,
   favorites: Favourites,
+  context: Context,
 ): Promise<AxiosResponse> => {
   try {
     const options: HsldIdOptions = {
@@ -103,6 +109,7 @@ export const updateFavorites = async (
     const response = await makeHslIdRequest(options);
     return response;
   } catch (err) {
+    context.log(err);
     throw new Err(500, `Updating datastorage failed`);
   }
 };
@@ -111,6 +118,7 @@ export const deleteFavorites = async (
   dsId: string | undefined,
   keys: Array<string>,
   store: string | undefined,
+  context: Context,
 ): Promise<AxiosResponse<string>[]> => {
   const responses = [];
   for (let i = 0; i < keys.length; i++) {
@@ -122,6 +130,7 @@ export const deleteFavorites = async (
       };
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
+      context.log(err);
       responses.push(err);
     }
   }
@@ -131,6 +140,7 @@ export const deleteFavorites = async (
 export const deleteExpiredNotes = async (
   dsId: string | undefined,
   favorites: Favourites,
+  context: Context,
 ): Promise<AxiosResponse<string>[]> => {
   let responses = [];
   const expired: string[] = [];
@@ -143,6 +153,6 @@ export const deleteExpiredNotes = async (
       delete favorites[key];
     }
   });
-  responses = await deleteFavorites(dsId, expired, undefined);
+  responses = await deleteFavorites(dsId, expired, undefined, context);
   return responses;
 };

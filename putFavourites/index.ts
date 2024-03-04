@@ -2,7 +2,7 @@ import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
-import { RedisSettings, Cache, Favourites, UpdateSchema } from '../util/types';
+import { Cache, Favourites, UpdateSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import {
   getFavorites,
@@ -12,9 +12,8 @@ import {
   deleteExpiredNotes,
 } from '../agent/Agent';
 import mergeFavorites from '../util/mergeFavorites';
-import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
-import Redis from 'ioredis';
+import getClient from '../util/redisClient';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -123,7 +122,7 @@ const expireNotes = async (
     return;
   }
   context.log('delete expired notes');
-  const deleteResponses = await deleteExpiredNotes(dsId, favorites);
+  const deleteResponses = await deleteExpiredNotes(dsId, favorites, context);
   if (deleteResponses.length > 0) {
     const deleteSuccessful = deleteResponses.every(
       (response: AxiosResponse) => response.status === 204,
@@ -141,10 +140,6 @@ const putFavoritesTrigger: AzureFunction = async function (
   req: HttpRequest,
 ): Promise<void> {
   try {
-    const settings: RedisSettings = {};
-    settings.redisHost = getRedisHost();
-    settings.redisPort = getRedisPort();
-    settings.redisPass = getRedisPass();
     const userId = req?.params?.id;
     const store = req?.query?.store;
     const type = req?.query?.type;
@@ -159,7 +154,7 @@ const putFavoritesTrigger: AzureFunction = async function (
     };
     try {
       context.log('searching existing datastorage');
-      const oldDataStorage = await getDataStorage(req.params.id);
+      const oldDataStorage = await getDataStorage(req.params.id, context);
       context.log('existing datastorage found');
       dataStorage.id = oldDataStorage.id;
     } catch (err) {
@@ -168,7 +163,10 @@ const putFavoritesTrigger: AzureFunction = async function (
         context.log('datastorage not found');
         try {
           context.log('trying to create new datastorage');
-          const newDataStorage = await createDataStorage(req.params.id);
+          const newDataStorage = await createDataStorage(
+            req.params.id,
+            context,
+          );
           context.log('datastorage created');
           dataStorage.id = newDataStorage;
         } catch (err) {
@@ -192,31 +190,24 @@ const putFavoritesTrigger: AzureFunction = async function (
     );
     await expireNotes(context, dataStorage.id, mergedFavorites);
     context.log('updating favorites to datastorage');
-    const response = await updateFavorites(dataStorage.id, mergedFavorites);
-    const cache: Cache = { data: mergedFavorites };
-    // update data to redis with hslid key
-    const redisOptions = settings.redisPass
-      ? {
-          password: settings.redisPass,
-          tls: { servername: settings.redisHost },
-        }
-      : {};
-    const client = new Redis({
-      port: settings.redisPort,
-      host: settings.redisHost,
-      connectTimeout: 2500,
-      ...redisOptions,
-    });
-    const waitForRedis = async (client: Redis) => {
+    const response = await updateFavorites(
+      dataStorage.id,
+      mergedFavorites,
+      context,
+    );
+    try {
+      const cache: Cache = { data: mergedFavorites };
+      // update data to redis with hslid key
+      const client = getClient();
       await client.set(
         key,
         JSON.stringify(cache.data),
         'EX',
         60 * 60 * 24 * 14,
       );
-      await client.quit();
-    };
-    await waitForRedis(client);
+    } catch (err) {
+      context.log(err); // redis IO error
+    }
     const filteredFavorites = filterFavorites(mergedFavorites, type);
     const statusCode = response.status === 204 ? 200 : response.status;
     const responseBody: string = JSON.stringify(
