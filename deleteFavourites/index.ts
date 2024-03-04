@@ -47,12 +47,13 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     validate(deleteSchema, schema);
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');
-    const dataStorage = await getDataStorage(req.params.id);
+    const dataStorage = await getDataStorage(req.params.id, context);
     context.log('deleting items');
     const hslidResponses = await deleteFavorites(
       dataStorage.id,
       req?.body,
       store,
+      context,
     );
     context.log('deleted items');
     const responses = req.body.map((key: string, i: number) => {

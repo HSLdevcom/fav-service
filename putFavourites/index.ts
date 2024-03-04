@@ -123,7 +123,7 @@ const expireNotes = async (
     return;
   }
   context.log('delete expired notes');
-  const deleteResponses = await deleteExpiredNotes(dsId, favorites);
+  const deleteResponses = await deleteExpiredNotes(dsId, favorites, context);
   if (deleteResponses.length > 0) {
     const deleteSuccessful = deleteResponses.every(
       (response: AxiosResponse) => response.status === 204,
@@ -159,7 +159,7 @@ const putFavoritesTrigger: AzureFunction = async function (
     };
     try {
       context.log('searching existing datastorage');
-      const oldDataStorage = await getDataStorage(req.params.id);
+      const oldDataStorage = await getDataStorage(req.params.id, context);
       context.log('existing datastorage found');
       dataStorage.id = oldDataStorage.id;
     } catch (err) {
@@ -168,7 +168,10 @@ const putFavoritesTrigger: AzureFunction = async function (
         context.log('datastorage not found');
         try {
           context.log('trying to create new datastorage');
-          const newDataStorage = await createDataStorage(req.params.id);
+          const newDataStorage = await createDataStorage(
+            req.params.id,
+            context,
+          );
           context.log('datastorage created');
           dataStorage.id = newDataStorage;
         } catch (err) {
@@ -192,7 +195,11 @@ const putFavoritesTrigger: AzureFunction = async function (
     );
     await expireNotes(context, dataStorage.id, mergedFavorites);
     context.log('updating favorites to datastorage');
-    const response = await updateFavorites(dataStorage.id, mergedFavorites);
+    const response = await updateFavorites(
+      dataStorage.id,
+      mergedFavorites,
+      context,
+    );
     const cache: Cache = { data: mergedFavorites };
     // update data to redis with hslid key
     const redisOptions = settings.redisPass

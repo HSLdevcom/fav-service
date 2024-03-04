@@ -80,7 +80,7 @@ const getFavoritesTrigger: AzureFunction = async function (
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
-      const dataStorage = await getDataStorage(req.params.id);
+      const dataStorage = await getDataStorage(req.params.id, context);
       context.log('found datastorage');
       const favorites = await getFavorites(dataStorage.id);
       const filteredFavorites = filterFavorites(favorites, type);
