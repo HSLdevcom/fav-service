@@ -2,7 +2,7 @@ import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
-import { RedisSettings, Cache, Favourites, UpdateSchema } from '../util/types';
+import { Cache, Favourites, UpdateSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import {
   getFavorites,
@@ -12,9 +12,8 @@ import {
   deleteExpiredNotes,
 } from '../agent/Agent';
 import mergeFavorites from '../util/mergeFavorites';
-import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
-import Redis from 'ioredis';
+import getClient from '../util/redisClient';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -141,10 +140,6 @@ const putFavoritesTrigger: AzureFunction = async function (
   req: HttpRequest,
 ): Promise<void> {
   try {
-    const settings: RedisSettings = {};
-    settings.redisHost = getRedisHost();
-    settings.redisPort = getRedisPort();
-    settings.redisPass = getRedisPass();
     const userId = req?.params?.id;
     const store = req?.query?.store;
     const type = req?.query?.type;
@@ -202,29 +197,14 @@ const putFavoritesTrigger: AzureFunction = async function (
     );
     try {
       const cache: Cache = { data: mergedFavorites };
-      // update da ta to redis with hslid key
-      const redisOptions = settings.redisPass
-        ? {
-            password: settings.redisPass,
-            tls: { servername: settings.redisHost },
-          }
-        : {};
-      const client = new Redis({
-        port: settings.redisPort,
-        host: settings.redisHost,
-        connectTimeout: 2500,
-        ...redisOptions,
-      });
-      const waitForRedis = async (client: Redis) => {
-        await client.set(
-          key,
-          JSON.stringify(cache.data),
-          'EX',
-          60 * 60 * 24 * 14,
-        );
-        await client.quit();
-      };
-      await waitForRedis(client);
+      // update data to redis with hslid key
+      const client = getClient();
+      await client.set(
+        key,
+        JSON.stringify(cache.data),
+        'EX',
+        60 * 60 * 24 * 14,
+      );
     } catch (err) {
       context.log(err); // redis IO error
     }

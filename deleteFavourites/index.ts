@@ -2,12 +2,11 @@ import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
 import createErrorResponse from '../util/createErrorResponse';
 import validate from '../util/validator';
-import { RedisSettings, DeleteSchema } from '../util/types';
+import { DeleteSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { deleteFavorites, getDataStorage, getFavorites } from '../agent/Agent';
-import { getRedisHost, getRedisPass, getRedisPort } from '../util/helpers';
 import filterFavorites from '../util/filterFavorites';
-import Redis from 'ioredis';
+import getClient from '../util/redisClient';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
   type: 'object',
@@ -32,10 +31,6 @@ const deleteFavouriteTrigger: AzureFunction = async function (
   req: HttpRequest,
 ): Promise<void> {
   try {
-    const settings: RedisSettings = {};
-    settings.redisHost = getRedisHost();
-    settings.redisPort = getRedisPort();
-    settings.redisPass = getRedisPass();
     const userId = req?.params?.id;
     const store = req?.query?.store;
     const type = req?.query?.type;
@@ -65,33 +60,8 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     });
     try {
       // redis delete key from cache
-      const redisOptions = settings.redisPass
-        ? {
-            password: settings.redisPass,
-            tls: { servername: settings.redisHost },
-          }
-        : {};
-      const client = new Redis({
-        port: settings.redisPort,
-        host: settings.redisHost,
-        connectTimeout: 2500,
-        ...redisOptions,
-      });
-      const waitForRedis = (client: Redis): Promise<void> =>
-        new Promise((resolve, reject) => {
-          client.on('ready', async () => {
-            context.log('redis connected');
-            await client.expire(String(key), 0);
-            client.quit();
-            resolve();
-          });
-          client.on('error', async () => {
-            context.log('redis error');
-            client.quit();
-            reject();
-          });
-        });
-      await waitForRedis(client);
+      const client = getClient();
+      await client.expire(String(key), 0);
     } catch (err) {
       context.log(err); // redis IO error
     }
