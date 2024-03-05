@@ -17,7 +17,6 @@ const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
     error?.message === 'User has no datastorage' ||
     error?.message === 'Could not get datastorage'
   ) {
-    context.log(error.message + ', returning empty array');
     const response: ErrorResponse = {
       body: JSON.stringify([]),
       status: 200,

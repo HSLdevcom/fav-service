@@ -44,13 +44,13 @@ export const getDataStorage = async (
     const dataStorage = response.data.resources[0];
     if (dataStorage) {
       return dataStorage;
-    } else {
-      throw new Err(404, 'User has no datastorage');
     }
   } catch (err) {
     context.log(err);
     throw new Err(404, 'Could not get datastorage');
   }
+  // handle nonexisting datastorabe by throwing an error
+  throw new Err(404, 'User has no datastorage');
 };
 
 export const createDataStorage = async (
