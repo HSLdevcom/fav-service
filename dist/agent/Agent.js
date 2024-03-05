@@ -42,14 +42,13 @@ const getDataStorage = (id, context) => __awaiter(void 0, void 0, void 0, functi
         if (dataStorage) {
             return dataStorage;
         }
-        else {
-            throw new Err_1.default(404, 'User has no datastorage');
-        }
     }
     catch (err) {
         context.log(err);
         throw new Err_1.default(404, 'Could not get datastorage');
     }
+    // handle nonexisting datastorabe by throwing an error
+    throw new Err_1.default(404, 'User has no datastorage');
 });
 exports.getDataStorage = getDataStorage;
 const createDataStorage = (id, context) => __awaiter(void 0, void 0, void 0, function* () {
