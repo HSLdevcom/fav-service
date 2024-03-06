@@ -93,6 +93,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'digitransit-dev2-fav-service/swap'
+          slot-name: 'swap'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_DEV_2024 }}
           package: ./favservice.zip
 
@@ -101,5 +102,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'digitransit-prod-fav-service/pre-prod'
+	  slot-name: 'pre-prod'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD_2024 }}
           package: ./favservice.zip
