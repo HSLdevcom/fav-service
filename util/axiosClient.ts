@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import axios, { AxiosInstance } from 'axios';
 const Agent = require('agentkeepalive');
 import { getManagementClientCredentials } from './helpers';
