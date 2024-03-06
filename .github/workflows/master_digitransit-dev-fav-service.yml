@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: "Checkout GitHub Action"
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v3
         with:
@@ -59,34 +59,47 @@ jobs:
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm run test
           popd
-  # build-and-deploy:
-  #   if: github.ref == 'refs/heads/master'
-  #   runs-on: windows-latest
-  #   needs:
-  #     - lint
-  #     - test
-  #   steps:
-  #     - name: "Checkout GitHub Action"
-  #       uses: actions/checkout@master
 
-  #     - name: Setup Node ${{ env.NODE_VERSION }} Environment
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
+  build-and-deploy:
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/prod'
+    runs-on: windows-latest
+    needs:
+      - lint
+      - test
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@v3
 
-  #     - name: "Resolve Project Dependencies Using Npm"
-  #       shell: pwsh
-  #       run: |
-  #         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-  #         npm install
-  #         npm run build
-  #         popd
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-  #     - name: "Run Azure Functions Action"
-  #       uses: Azure/functions-action@v1
-  #       id: fa
-  #       with:
-  #         app-name: "digitransit-dev-fav-service"
-  #         slot-name: "production"
-  #         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-  #         publish-profile: ${{ secrets.AzureAppService_PublishProfile_34e14891bd934a1c823137b1a42111e3 }}
+      - name: "Resolve Project Dependencies Using Npm"
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          npm run build
+          popd
+
+      - name: "Create zip"
+        run: |
+          Get-ChildItem $pwd | Compress-Archive -Destination .\favservice.zip
+        shell: pwsh
+
+      - name: 'Deploy the zip to dev'
+        if: github.ref == 'refs/heads/master'
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: digitransit-dev-fav-service-pre-dev
+            publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_DEV_2024 }}
+            package: ./favservice.zip
+
+      - name: 'Deploy the zip to prod'
+        if: github.ref == 'refs/heads/prod'
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: 'digitransit-prod-fav-service-pre-prod'
+            publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD_2024 }}
+            package: ./favservice.zip
