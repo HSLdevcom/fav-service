@@ -1,27 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { Context } from '@azure/functions';
-import {
-  getHslIdUrl,
-  getManagementClientCredentials,
-  getManagementClientId,
-} from '../util/helpers';
 import Err from '../util/Err';
 import { HsldIdOptions, Favourites } from '../util/types';
+import getAxios from '../util/axiosClient';
+import { getHslIdUrl, getManagementClientId } from '../util/helpers';
 
 const makeHslIdRequest = async (
   options: HsldIdOptions,
 ): Promise<AxiosResponse> => {
+  const client = getAxios();
   const hslIdUrl = getHslIdUrl();
-  const credentials = getManagementClientCredentials();
   options.url = `${hslIdUrl}${options.endpoint}`;
-  options.headers = {
-    Authorization: credentials,
-    'Content-Type': 'application/json',
-  };
-  const response: AxiosResponse = await axios(options);
+  const response: AxiosResponse = await client(options);
   return response;
 };
 
