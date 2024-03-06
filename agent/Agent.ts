@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import axios, { AxiosResponse } from 'axios';
+kyimport axios, { AxiosResponse } from 'axios';
 import { Context } from '@azure/functions';
 import {
   getHslIdUrl,
   getManagementClientCredentials,
   getManagementClientId,
 } from '../util/helpers';
-import Err from '../util/Err';
 import { HsldIdOptions, Favourites } from '../util/types';
+import Err from '../util/Err';
 
 const makeHslIdRequest = async (
   options: HsldIdOptions,
