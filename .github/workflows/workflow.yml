@@ -88,18 +88,18 @@ jobs:
           Get-ChildItem $pwd | Compress-Archive -Destination .\favservice.zip
         shell: pwsh
 
-      - name: 'Deploy the zip to dev'
+      - name: "Deploy the zip to dev"
         if: github.ref == 'refs/heads/master'
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: digitransit-dev-fav-service-pre-dev
-            publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_DEV_2024 }}
-            package: ./favservice.zip
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: digitransit-dev-fav-service-pre-dev
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_DEV_2024 }}
+          package: ./favservice.zip
 
-      - name: 'Deploy the zip to prod'
+      - name: "Deploy the zip to prod"
         if: github.ref == 'refs/heads/prod'
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: 'digitransit-prod-fav-service-pre-prod'
-            publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD_2024 }}
-            package: ./favservice.zip
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: digitransit-prod-fav-service-pre-prod
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD_2024 }}
+          package: ./favservice.zip
