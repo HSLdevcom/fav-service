@@ -25,14 +25,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: "Resolve Project Dependencies Using Npm"
+      - name: "Resolve Project Dependencies Using Yarn"
         shell: pwsh
         run: |
-          npm install
+          yarn
       - name: "Run linter"
         shell: pwsh
         run: |
-          npm run lint
+          yarn lint
   test:
     runs-on: windows-latest
     steps:
@@ -42,14 +42,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: "Resolve Project Dependencies Using Npm"
+      - name: "Resolve Project Dependencies Using Yarn"
         shell: pwsh
         run: |
-          npm install
+          yarn
       - name: "Run tests"
         shell: pwsh
         run: |
-          npm run test
+          yarn test
 
   build-and-deploy:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/prod'
@@ -66,11 +66,11 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: "Resolve Project Dependencies Using Npm"
+      - name: "Resolve Project Dependencies Using Yarn"
         shell: pwsh
         run: |
-          npm install
-          npm run build
+          yarn
+          yarn build
 
       - name: "Create zip"
         run: |
