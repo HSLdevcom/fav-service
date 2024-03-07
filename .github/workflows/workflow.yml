@@ -13,8 +13,7 @@ on:
       - master
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: "." # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: "16.x" # set this to the node version to use (supports 12.x, 14.x, 16.x)
+  NODE_VERSION: "16.x"
 
 jobs:
   lint:
@@ -29,15 +28,11 @@ jobs:
       - name: "Resolve Project Dependencies Using Npm"
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          popd
       - name: "Run linter"
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm run lint
-          popd
   test:
     runs-on: windows-latest
     steps:
@@ -50,15 +45,11 @@ jobs:
       - name: "Resolve Project Dependencies Using Npm"
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          popd
       - name: "Run tests"
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm run test
-          popd
 
   build-and-deploy:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/prod'
@@ -78,10 +69,8 @@ jobs:
       - name: "Resolve Project Dependencies Using Npm"
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
           npm run build
-          popd
 
       - name: "Create zip"
         run: |
