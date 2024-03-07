@@ -10,21 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteExpiredNotes = exports.deleteFavorites = exports.updateFavorites = exports.getFavorites = exports.createDataStorage = exports.getDataStorage = void 0;
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-const axios_1 = require("axios");
-const helpers_1 = require("../util/helpers");
 const Err_1 = require("../util/Err");
+const axiosClient_1 = require("../util/axiosClient");
+const helpers_1 = require("../util/helpers");
 const makeHslIdRequest = (options) => __awaiter(void 0, void 0, void 0, function* () {
+    const client = axiosClient_1.default();
     const hslIdUrl = helpers_1.getHslIdUrl();
-    const credentials = helpers_1.getManagementClientCredentials();
     options.url = `${hslIdUrl}${options.endpoint}`;
-    options.headers = {
-        Authorization: credentials,
-        'Content-Type': 'application/json',
-    };
-    const response = yield axios_1.default(options);
+    const response = yield client(options);
     return response;
 });
 const getDataStorage = (id, context) => __awaiter(void 0, void 0, void 0, function* () {
