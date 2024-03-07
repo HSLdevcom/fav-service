@@ -13,10 +13,7 @@ interface ErrorResponse {
 const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
   context.log(error);
 
-  if (
-    error?.message === 'User has no datastorage' ||
-    error?.message === 'Could not get datastorage'
-  ) {
+  if ( error?.message === 'User has no datastorage' ) {
     const response: ErrorResponse = {
       body: JSON.stringify([]),
       status: 200,
