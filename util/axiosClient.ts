@@ -13,16 +13,9 @@ export default function getAxios(): AxiosInstance {
       timeout: 60000,
       freeSocketTimeout: 30000,
     });
-    const httpsAgent = new Agent({
-      maxSockets: 100,
-      maxFreeSockets: 10,
-      timeout: 60000,
-      freeSocketTimeout: 30000,
-    });
     const credentials = getManagementClientCredentials();
     client = axios.create({
       httpAgent,
-      httpsAgent,
       headers: {
         Authorization: credentials,
         'Content-Type': 'application/json',
