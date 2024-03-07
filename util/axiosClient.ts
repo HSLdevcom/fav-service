@@ -20,7 +20,7 @@ export default function getAxios(): AxiosInstance {
         Authorization: credentials,
         'Content-Type': 'application/json',
       },
-      timeout: 5000,
+      timeout: 8000,
     });
   }
   return client;
