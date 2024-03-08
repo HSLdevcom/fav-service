@@ -47,6 +47,9 @@ export const getDataStorage = async (
     } else {
       context.error(err);
     }
+    if (err?.code === 'ECONNABORTED') {
+      throw new Err(504, 'Datastorage timeout exceeded');
+    }
     throw new Err(404, 'Could not get datastorage');
   }
   context.log('User has no datastorage');
