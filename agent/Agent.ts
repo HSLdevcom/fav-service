@@ -40,10 +40,10 @@ export const getDataStorage = async (
     }
   } catch (err) {
     context.log(err);
-    throw new Err(404, 'Could not get datastorage');
+    throw err;
   }
-  // handle nonexisting datastorabe by throwing an error
-  throw new Err(404, 'User has no datastorage');
+  context.log('User has no datastorage');
+  return null;
 };
 
 export const createDataStorage = async (
