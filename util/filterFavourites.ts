@@ -1,13 +1,13 @@
 import { Favourite, Favourites } from '../util/types';
 
-const filterFavorites = (
-  favorites: Favourites,
+const filterFavourites = (
+  favourites: Favourites,
   type: string | undefined = undefined,
 ): Array<Favourite> => {
   const types = type?.split(',');
-  const keys = Object.keys(favorites);
+  const keys = Object.keys(favourites);
   const responseArray: Array<Favourite> = keys.map((key: string) => {
-    return Object(favorites)[key];
+    return Object(favourites)[key];
   });
   const defaultTypes = ['route', 'stop', 'station', 'place', 'bikeStation'];
   const filteredArray: Array<Favourite> = responseArray.filter(item => {
@@ -24,4 +24,4 @@ const filterFavorites = (
   return filteredArray;
 };
 
-export default filterFavorites;
+export default filterFavourites;

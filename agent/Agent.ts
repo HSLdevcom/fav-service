@@ -27,7 +27,7 @@ export const getDataStorage = async (
     method: 'GET',
     endpoint: '/api/rest/v1/datastorage',
     params: {
-      dsfilter: `ownerId eq "${id}" and name eq "favorites-${
+      dsfilter: `ownerId eq "${id}" and name eq "favourites-${
         managementClientId || ''
       }"`,
     },
@@ -56,7 +56,7 @@ export const createDataStorage = async (
       method: 'POST',
       endpoint: `/api/rest/v1/datastorage`,
       data: {
-        name: `favorites-${managementClientId || ''}`,
+        name: `favourites-${managementClientId || ''}`,
         description: 'Suosikit',
         ownerId: id,
         adminAccess: [managementClientId],
@@ -72,7 +72,7 @@ export const createDataStorage = async (
   }
 };
 
-export const getFavorites = async (
+export const getFavourites = async (
   dsId: string | undefined,
 ): Promise<Favourites> => {
   const options: HsldIdOptions = {
@@ -88,16 +88,16 @@ export const getFavorites = async (
   }
 };
 
-export const updateFavorites = async (
+export const updateFavourites = async (
   dsId: string | undefined,
-  favorites: Favourites,
+  favourites: Favourites,
   context: Context,
 ): Promise<AxiosResponse> => {
   try {
     const options: HsldIdOptions = {
       method: 'PUT',
       endpoint: `/api/rest/v1/datastorage/${dsId}/data`,
-      data: favorites,
+      data: favourites,
     };
     const response = await makeHslIdRequest(options);
     return response;
@@ -107,7 +107,7 @@ export const updateFavorites = async (
   }
 };
 
-export const deleteFavorites = async (
+export const deleteFavourites = async (
   dsId: string | undefined,
   keys: Array<string>,
   store: string | undefined,
@@ -132,20 +132,20 @@ export const deleteFavorites = async (
 
 export const deleteExpiredNotes = async (
   dsId: string | undefined,
-  favorites: Favourites,
+  favourites: Favourites,
   context: Context,
 ): Promise<AxiosResponse<string>[]> => {
   let responses = [];
   const expired: string[] = [];
-  const keys = Object.keys(favorites);
+  const keys = Object.keys(favourites);
   keys.forEach(key => {
-    const fav = favorites[key];
+    const fav = favourites[key];
     const now = Math.floor(Date.now() / 1000); // Unix time in seconds
     if (String(fav.type) === 'note' && Number(fav?.expires) < now) {
       expired.push(key);
-      delete favorites[key];
+      delete favourites[key];
     }
   });
-  responses = await deleteFavorites(dsId, expired, undefined, context);
+  responses = await deleteFavourites(dsId, expired, undefined, context);
   return responses;
 };

@@ -1,7 +1,7 @@
 {
-  "name": "favorites-ms",
+  "name": "favourites-ms",
   "version": "0.0.1",
-  "description": "Favorites microservice for HSL",
+  "description": "Favourites microservice for HSL",
   "main": "index.js",
   "repository": "https://gitlab.hsl.fi/mobidigi/fav-service",
   "author": "Krister Bäckman <krister.backman@digia.com>",

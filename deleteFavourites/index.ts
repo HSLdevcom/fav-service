@@ -4,8 +4,12 @@ import { createErrorResponse, createResponse } from '../util/responses';
 import validate from '../util/validator';
 import { DeleteSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { deleteFavorites, getDataStorage, getFavorites } from '../agent/Agent';
-import filterFavorites from '../util/filterFavorites';
+import {
+  deleteFavourites,
+  getDataStorage,
+  getFavourites,
+} from '../agent/Agent';
+import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
@@ -44,11 +48,11 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     context.log('getting dataStorage');
     const dataStorage = await getDataStorage(req.params.id, context);
     if (!dataStorage) {
-      context.res = createResponse(JSON.stringify([]), context);
+      context.res = createResponse(JSON.stringify([]));
       return;
     }
     context.log('deleting items');
-    const hslidResponses = await deleteFavorites(
+    const hslidResponses = await deleteFavourites(
       dataStorage.id,
       req?.body,
       store,
@@ -72,9 +76,9 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     const deleteSuccessful = responses.every(
       (response: AxiosResponse) => response.status === 204,
     );
-    const favorites = await getFavorites(dataStorage.id);
-    const filteredFavorites = filterFavorites(favorites, type);
-    const responseBody = JSON.stringify(Object.values(filteredFavorites));
+    const favourites = await getFavourites(dataStorage.id);
+    const filteredFavourites = filterFavourites(favourites, type);
+    const responseBody = JSON.stringify(Object.values(filteredFavourites));
     context.res = {
       status: deleteSuccessful ? 200 : 400,
       body: deleteSuccessful ? responseBody : responses,

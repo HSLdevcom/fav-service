@@ -9,7 +9,7 @@
       "methods": [
         "get"
       ],
-      "route": "favorites/{id}"
+      "route": "favourites/{id}"
     },
     {
       "type": "http",

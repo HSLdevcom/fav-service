@@ -33,7 +33,7 @@ describe('getFavourites', () => {
   it('Should thow an error if datastorage connection fails', async () => {
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
-      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
       .reply(404, dataStorageNotFoundResponse);
 
     const request = {
@@ -52,7 +52,7 @@ describe('getFavourites', () => {
   it('should return favourites with existing hslid', async () => {
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
-      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
       .reply(200, dataStorageFoundResponse);
 
     nock('http://localhost')
@@ -96,7 +96,7 @@ describe('getFavourites', () => {
   it('should return only favourites by defined type in query', async () => {
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
-      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
       .reply(200, dataStorageFoundResponse);
 
     nock('http://localhost')

@@ -19,7 +19,7 @@ export const createErrorResponse = (error: Err, context: Context): Response => {
   return { status: 500, body: error?.message };
 };
 
-export const createResponse = (body: string, context: Context): Response => {
+export const createResponse = (body: string): Response => {
   const response: Response = {
     body,
     status: 200,

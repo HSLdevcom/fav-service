@@ -7,7 +7,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["delete"],
-      "route": "favorites/{id}"
+      "route": "favourites/{id}"
     },
     {
       "type": "http",

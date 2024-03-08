@@ -1,4 +1,4 @@
-# Favorites microservice
+# Favourites microservice
 
 ## Local environment 
 

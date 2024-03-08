@@ -4,8 +4,8 @@ import { Cache, GetSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
 import { createErrorResponse, createResponse } from '../util/responses';
-import { getDataStorage, getFavorites } from '../agent/Agent';
-import filterFavorites from '../util/filterFavorites';
+import { getDataStorage, getFavourites } from '../agent/Agent';
+import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
 
 const getSchema: JSONSchemaType<GetSchema> = {
@@ -22,7 +22,7 @@ const getSchema: JSONSchemaType<GetSchema> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const getFavoritesTrigger: AzureFunction = async function (
+const getFavouritesTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest,
 ): Promise<void> {
@@ -53,28 +53,33 @@ const getFavoritesTrigger: AzureFunction = async function (
   }
 
   try {
-    let filteredFavorites: Array<Favourite>;
+    let filteredFavourites: Array<Favourite>;
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
       const dataStorage = await getDataStorage(req.params.id, context);
       if (!dataStorage) {
-        context.res = createResponse(JSON.stringify([]), context);
+        context.res = createResponse(JSON.stringify([]));
         return;
       }
       context.log('found datastorage');
-      const favorites = await getFavorites(dataStorage.id);
-      filteredFavorites = filterFavorites(favorites, type);
+      const favourites = await getFavourites(dataStorage.id);
+      filteredFavourites = filterFavourites(favourites, type);
       context.log('caching data');
-      await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
+      await client.set(
+        key,
+        JSON.stringify(favourites),
+        'EX',
+        60 * 60 * 24 * 14,
+      );
     } else {
       context.log('found data in cache');
-      filteredFavorites = filterFavorites(cache.data, type);
+      filteredFavourites = filterFavourites(cache.data, type);
     }
-    context.res = createResponse(JSON.stringify(filteredFavorites), context);
+    context.res = createResponse(JSON.stringify(filteredFavourites));
   } catch (err) {
     context.res = createErrorResponse(err, context);
   }
 };
 
-export default getFavoritesTrigger;
+export default getFavouritesTrigger;
