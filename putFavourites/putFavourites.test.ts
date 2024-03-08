@@ -61,7 +61,7 @@ describe('putFavourites', () => {
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
       .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
-      .reply(404, dataStorageNotFoundResponse);
+      .reply(200, dataStorageNotFoundResponse);
 
     nock('http://localhost')
       .post('/api/rest/v1/datastorage')
