@@ -4,7 +4,7 @@ import getFavourites from '.';
 import * as mockData from '../get_mock.json';
 
 const dataStorageNotFoundResponse = {
-  message: 'Datastorage not found',
+  message: 'User has no datastorage',
 };
 
 const dataStorageFoundResponse = {
@@ -30,7 +30,7 @@ describe('getFavourites', () => {
 
   afterEach(() => nock.cleanAll());
 
-  it('should return empty array when datastorage is not found or created yet', async () => {
+  it('Should thow an error if datastorage connection fails', async () => {
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
       .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
@@ -46,8 +46,7 @@ describe('getFavourites', () => {
       },
     };
     await getFavourites(context, request);
-    expect(context?.res?.status).toEqual(200);
-    expect(context?.res?.body).toEqual('[]');
+    expect(context?.res?.status).toEqual(500);
   });
 
   it('should return favourites with existing hslid', async () => {

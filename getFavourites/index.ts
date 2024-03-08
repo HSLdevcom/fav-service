@@ -3,7 +3,7 @@ import { JSONSchemaType } from 'ajv';
 import { Cache, GetSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
-import createErrorResponse from '../util/createErrorResponse';
+import { createErrorResponse, createResponse } from '../util/responses';
 import { getDataStorage, getFavorites } from '../agent/Agent';
 import filterFavorites from '../util/filterFavorites';
 import getClient from '../util/redisClient';
@@ -53,35 +53,25 @@ const getFavoritesTrigger: AzureFunction = async function (
   }
 
   try {
+    let filteredFavorites: Array<Favourite>;
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
       const dataStorage = await getDataStorage(req.params.id, context);
+      if (!dataStorage) {
+        context.res = createResponse(JSON.stringify([]), context);
+        return;
+      }
       context.log('found datastorage');
       const favorites = await getFavorites(dataStorage.id);
-      const filteredFavorites = filterFavorites(favorites, type);
-      const json = JSON.stringify(filteredFavorites);
+      filteredFavorites = filterFavorites(favorites, type);
       context.log('caching data');
       await client.set(key, JSON.stringify(favorites), 'EX', 60 * 60 * 24 * 14);
-      context.res = {
-        status: 200,
-        body: json,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
     } else {
       context.log('found data in cache');
-      const filteredFavorites = filterFavorites(cache.data, type);
-      const json = JSON.stringify(filteredFavorites);
-      context.res = {
-        status: 200,
-        body: json,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
+      filteredFavorites = filterFavorites(cache.data, type);
     }
+    context.res = createResponse(JSON.stringify(filteredFavorites), context);
   } catch (err) {
     context.res = createErrorResponse(err, context);
   }
