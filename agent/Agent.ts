@@ -39,7 +39,14 @@ export const getDataStorage = async (
       return dataStorage;
     }
   } catch (err) {
-    context.log(err?.toString());
+    if(err?.response) {
+      context.log(err.response.data);
+      context.log(err.response.status);
+    } else if err?.message {
+      context.log(err.message);
+    } else {
+      context.log(err);
+    }
     throw new Err(404, 'Could not get datastorage');
   }
   context.log('User has no datastorage');
