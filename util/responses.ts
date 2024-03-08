@@ -1,7 +1,7 @@
 import { Context } from '@azure/functions';
 import Err from './Err';
 
-interface ErrorResponse {
+interface Response {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: Array<any> | string;
   status: number;
@@ -10,19 +10,8 @@ interface ErrorResponse {
   };
 }
 
-const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
+export const createErrorResponse = (error: Err, context: Context): Response => {
   context.log(error);
-
-  if ( error?.message === 'User has no datastorage' ) {
-    const response: ErrorResponse = {
-      body: JSON.stringify([]),
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    return response;
-  }
 
   if (error?.status) {
     return { body: error?.message, status: error?.status };
@@ -30,4 +19,13 @@ const createErrorResponse = (error: Err, context: Context): ErrorResponse => {
   return { status: 500, body: error?.message };
 };
 
-export default createErrorResponse;
+export const createResponse = (body: string, context: Context): Response => {
+  const response: Response = {
+    body,
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  return response;
+};
