@@ -1,6 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
-import createErrorResponse from '../util/createErrorResponse';
+import { createErrorResponse } from '../util/responses';
 import validate from '../util/validator';
 import { Cache, Favourites, UpdateSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
@@ -152,30 +152,30 @@ const putFavoritesTrigger: AzureFunction = async function (
     const dataStorage = {
       id: '',
     };
+    let oldDataStorage;
     try {
-      context.log('searching existing datastorage');
-      const oldDataStorage = await getDataStorage(req.params.id, context);
-      context.log('existing datastorage found');
-      dataStorage.id = oldDataStorage.id;
+      context.log('searching existing datastorage for putFavourites');
+      oldDataStorage = await getDataStorage(req.params.id, context);
     } catch (err) {
       context.log('error occured');
       if (err.status && err.status === 404) {
         context.log('datastorage not found');
-        try {
-          context.log('trying to create new datastorage');
-          const newDataStorage = await createDataStorage(
-            req.params.id,
-            context,
-          );
-          context.log('datastorage created');
-          dataStorage.id = newDataStorage;
-        } catch (err) {
-          context.log('something went wrong creating datastorage');
-          throw err;
-        }
       } else {
         context.log('some other error occured');
-        context.log(err);
+        throw err;
+      }
+    }
+    if (oldDataStorage) {
+      context.log('existing datastorage found');
+      dataStorage.id = oldDataStorage.id;
+    } else {
+      context.log('trying to create new datastorage');
+      try {
+        const newDataStorage = await createDataStorage(req.params.id, context);
+        context.log('datastorage created');
+        dataStorage.id = newDataStorage;
+      } catch (err) {
+        context.log('something went wrong creating datastorage');
         throw err;
       }
     }
