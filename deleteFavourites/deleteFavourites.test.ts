@@ -22,11 +22,15 @@ const fav = {
   lastUpdated: 1629812636,
   favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
 };
+
+const mockContext: any = { log: jest.fn() };
+mockContext.log.error = jest.fn();
+
 describe('deleteFavourites', () => {
   let context: Context;
 
   beforeEach(() => {
-    context = { log: jest.fn() } as unknown as Context;
+    context = mockContext as unknown as Context;
     process.env.hslIdUrl = 'http://localhost';
     process.env.clientId = '999';
     process.env.clientCredentials = 'Basic asdasd';

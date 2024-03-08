@@ -40,12 +40,12 @@ export const getDataStorage = async (
     }
   } catch (err) {
     if (err?.response) {
-      context.error(err.response.data);
-      context.error(err.response.status);
+      context.log.error(err.response.data);
+      context.log.error(err.response.status);
     } else if (err?.message) {
-      context.error(err.message);
+      context.log.error(err.message);
     } else {
-      context.error(err);
+      context.log.error(err);
     }
     if (err?.code === 'ECONNABORTED') {
       throw new Err(504, 'Datastorage timeout exceeded');
@@ -77,7 +77,7 @@ export const createDataStorage = async (
     const response = await makeHslIdRequest(options);
     return response.data.id;
   } catch (err) {
-    context.error(err);
+    context.log.error(err);
     throw new Err(500, `Creating datastorage failed`);
   }
 };
@@ -112,7 +112,7 @@ export const updateFavourites = async (
     const response = await makeHslIdRequest(options);
     return response;
   } catch (err) {
-    context.error(err);
+    context.log.error(err);
     throw new Err(500, `Updating datastorage failed`);
   }
 };
@@ -133,7 +133,7 @@ export const deleteFavourites = async (
       };
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
-      context.error(err);
+      context.log.error(err);
       responses.push(err);
     }
   }

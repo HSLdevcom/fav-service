@@ -11,7 +11,7 @@ interface Response {
 }
 
 export const createErrorResponse = (error: Err, context: Context): Response => {
-  context.error(error?.toString());
+  context.log.error(error?.toString());
 
   if (error?.status) {
     return { body: error?.message, status: error?.status };

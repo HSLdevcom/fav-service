@@ -71,7 +71,7 @@ const deleteFavouriteTrigger: AzureFunction = async function (
       const client = getClient();
       await client.expire(String(key), 0);
     } catch (err) {
-      context.error(err); // redis IO error
+      context.log.error(err); // redis IO error
     }
     const deleteSuccessful = responses.every(
       (response: AxiosResponse) => response.status === 204,

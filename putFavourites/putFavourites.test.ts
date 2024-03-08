@@ -36,11 +36,14 @@ const baseRequest = {
   },
 };
 
+const mockContext: any = { log: jest.fn() };
+mockContext.log.error = jest.fn();
+
 describe('putFavourites', () => {
   let context: Context;
 
   beforeEach(() => {
-    context = { log: jest.fn() } as unknown as Context;
+    context = mockContext as unknown as Context;
     process.env.hslIdUrl = 'http://localhost';
     process.env.clientId = '999';
     process.env.clientCredentials = 'Basic asdasd';
