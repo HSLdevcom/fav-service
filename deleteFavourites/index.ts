@@ -1,6 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 import { AxiosResponse } from 'axios';
-import createErrorResponse from '../util/createErrorResponse';
+import { createErrorResponse, createResponse } from '../util/responses';
 import validate from '../util/validator';
 import { DeleteSchema } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
@@ -43,6 +43,10 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     const key = store ? `${store}-${req.params.id}` : req.params.id;
     context.log('getting dataStorage');
     const dataStorage = await getDataStorage(req.params.id, context);
+    if (!dataStorage) {
+      context.res = createResponse(JSON.stringify([]), context);
+      return;
+    }
     context.log('deleting items');
     const hslidResponses = await deleteFavorites(
       dataStorage.id,
