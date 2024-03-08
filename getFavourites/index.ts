@@ -49,7 +49,7 @@ const getFavouritesTrigger: AzureFunction = async function (
     const data = String(await client.get(key));
     cache = { data: JSON.parse(data) };
   } catch (err) {
-    context.log(err); // redis IO error - not fatal, just log
+    context.error(err); // redis IO error - not fatal, just log
   }
 
   try {

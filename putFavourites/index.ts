@@ -130,7 +130,7 @@ const expireNotes = async (
     if (deleteSuccessful) {
       context.log('expired notes succesfully');
     } else {
-      context.log('expiring notes failed');
+      context.warn('expiring notes failed');
     }
   }
 };
@@ -164,7 +164,7 @@ const putFavouritesTrigger: AzureFunction = async function (
         context.log('datastorage created');
         dataStorage.id = newDataStorage;
       } catch (err) {
-        context.log('something went wrong creating datastorage');
+        context.error('something went wrong creating datastorage');
         throw err;
       }
     }
@@ -195,7 +195,7 @@ const putFavouritesTrigger: AzureFunction = async function (
         60 * 60 * 24 * 14,
       );
     } catch (err) {
-      context.log(err); // redis IO error
+      context.error(err); // redis IO error
     }
     const filteredFavourites = filterFavourites(mergedFavourites, type);
     const statusCode = response.status === 204 ? 200 : response.status;

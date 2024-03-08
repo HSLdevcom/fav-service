@@ -40,12 +40,12 @@ export const getDataStorage = async (
     }
   } catch (err) {
     if (err?.response) {
-      context.log(err.response.data);
-      context.log(err.response.status);
+      context.error(err.response.data);
+      context.error(err.response.status);
     } else if (err?.message) {
-      context.log(err.message);
+      context.error(err.message);
     } else {
-      context.log(err);
+      context.error(err);
     }
     throw new Err(404, 'Could not get datastorage');
   }
@@ -74,7 +74,7 @@ export const createDataStorage = async (
     const response = await makeHslIdRequest(options);
     return response.data.id;
   } catch (err) {
-    context.log(err);
+    context.error(err);
     throw new Err(500, `Creating datastorage failed`);
   }
 };
@@ -109,7 +109,7 @@ export const updateFavourites = async (
     const response = await makeHslIdRequest(options);
     return response;
   } catch (err) {
-    context.log(err);
+    context.error(err);
     throw new Err(500, `Updating datastorage failed`);
   }
 };
@@ -130,7 +130,7 @@ export const deleteFavourites = async (
       };
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
-      context.log(err);
+      context.error(err);
       responses.push(err);
     }
   }
