@@ -152,9 +152,8 @@ const putFavouritesTrigger: AzureFunction = async function (
     const dataStorage = {
       id: '',
     };
-    let oldDataStorage;
     context.log('searching existing datastorage for putFavourites');
-    oldDataStorage = await getDataStorage(req.params.id, context);
+    const oldDataStorage = await getDataStorage(req.params.id, context);
     if (oldDataStorage) {
       context.log('existing datastorage found');
       dataStorage.id = oldDataStorage.id;

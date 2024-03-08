@@ -39,7 +39,7 @@ export const getDataStorage = async (
       return dataStorage;
     }
   } catch (err) {
-    if(err?.response) {
+    if (err?.response) {
       context.log(err.response.data);
       context.log(err.response.status);
     } else if (err?.message) {
