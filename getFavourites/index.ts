@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { JSONSchemaType } from 'ajv';
-import { Cache, GetSchema } from '../util/types';
+import { Cache, GetSchema, Favourite } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
 import { createErrorResponse, createResponse } from '../util/responses';

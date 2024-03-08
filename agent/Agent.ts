@@ -21,7 +21,7 @@ const makeHslIdRequest = async (
 export const getDataStorage = async (
   id: string | undefined,
   context: Context,
-): Promise<{ [key: string]: string }> => {
+): Promise<{ [key: string]: string } | null> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
     method: 'GET',
@@ -34,13 +34,13 @@ export const getDataStorage = async (
   };
   try {
     const response = await makeHslIdRequest(options);
-    const dataStorage = response.data.resources[0];
+    const dataStorage = response.data?.resources?.[0];
     if (dataStorage) {
       return dataStorage;
     }
   } catch (err) {
-    context.log(err);
-    throw err;
+    context.log(err?.toString());
+    throw new Err(404, 'Could not get datastorage');
   }
   context.log('User has no datastorage');
   return null;

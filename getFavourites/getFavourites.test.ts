@@ -46,7 +46,7 @@ describe('getFavourites', () => {
       },
     };
     await getFavourites(context, request);
-    expect(context?.res?.status).toEqual(500);
+    expect(context?.res?.status).toEqual(404);
   });
 
   it('should return favourites with existing hslid', async () => {

@@ -79,8 +79,8 @@ describe('putFavourites', () => {
       ...baseRequest,
       body: [favourite],
     };
-    await putFavourites(context, request);
 
+    await putFavourites(context, request);
     const body = JSON.parse(context?.res?.body);
 
     expect(context?.res?.status).toEqual(200);
