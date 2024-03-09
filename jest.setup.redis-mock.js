@@ -2,6 +2,7 @@
 const RedisMock = require('ioredis-mock');
 jest.mock('ioredis', () => jest.requireActual('ioredis-mock'));
 
+// eslint-disable-next-line
 const redis = new RedisMock({
   port: 1234,
   host: 'example.com',

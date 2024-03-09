@@ -23,6 +23,7 @@ const fav = {
   favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockContext: any = { log: jest.fn() };
 mockContext.log.error = jest.fn();
 

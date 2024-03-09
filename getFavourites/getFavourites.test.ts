@@ -15,6 +15,7 @@ const dataStorageFoundResponse = {
   ],
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockContext: any = { log: jest.fn() };
 mockContext.log.error = jest.fn();
 
