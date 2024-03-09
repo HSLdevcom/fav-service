@@ -8,7 +8,7 @@ let client: AxiosInstance;
 export default function getAxios(): AxiosInstance {
   if (!client) {
     const httpAgent = new Agent({
-      maxSockets: 100,
+      maxSockets: 128,
       maxFreeSockets: 10,
       timeout: 60000,
       freeSocketTimeout: 30000,
