@@ -44,17 +44,17 @@ const getFavouritesTrigger: AzureFunction = async function (
   let cache!: Cache;
 
   const client = getClient();
-  try {
+  /*  try {
     context.log('checking redis cache');
     const data = String(await client.get(key));
     cache = { data: JSON.parse(data) };
   } catch (err) {
     context.log.error(err); // redis IO error - not fatal, just log
-  }
+  } */
 
   try {
     let filteredFavourites: Array<Favourite>;
-    if (/* !cache || cache.data === null */ true) {
+    if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
       const dataStorage = await getDataStorage(req.params.id, context);
