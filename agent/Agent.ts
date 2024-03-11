@@ -27,7 +27,7 @@ export const getDataStorage = async (
     method: 'GET',
     endpoint: '/api/rest/v1/datastorage',
     params: {
-      dsfilter: `ownerId eq "${id}" and name eq "favourites-${
+      dsfilter: `ownerId eq "${id}" and name eq "favorites-${
         managementClientId || ''
       }"`,
     },
@@ -66,7 +66,7 @@ export const createDataStorage = async (
       method: 'POST',
       endpoint: `/api/rest/v1/datastorage`,
       data: {
-        name: `favourites-${managementClientId || ''}`,
+        name: `favorites-${managementClientId || ''}`,
         description: 'Suosikit',
         ownerId: id,
         adminAccess: [managementClientId],

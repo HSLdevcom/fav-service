@@ -64,7 +64,7 @@ describe('putFavourites', () => {
     };
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
-      .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
       .reply(200, dataStorageNotFoundResponse);
 
     nock('http://localhost')
@@ -99,7 +99,7 @@ describe('putFavourites', () => {
     };
     nock('http://localhost')
       .get('/api/rest/v1/datastorage')
-      .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+      .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
       .reply(200, dataStorageFoundResponse);
 
     nock('http://localhost')
@@ -174,7 +174,7 @@ describe('putFavourites', () => {
       };
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -216,7 +216,7 @@ describe('putFavourites', () => {
       };
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -246,7 +246,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -324,7 +324,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -415,7 +415,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -506,7 +506,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -644,7 +644,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -747,7 +747,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -845,7 +845,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
 
       nock('http://localhost')
@@ -923,7 +923,7 @@ describe('putFavourites', () => {
     beforeEach(() => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage')
-        .query({ dsfilter: `ownerId eq "foobar" and name eq "favourites-999"` })
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
         .reply(200, dataStorageFoundResponse);
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
