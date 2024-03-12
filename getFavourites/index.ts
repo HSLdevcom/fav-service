@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { JSONSchemaType } from 'ajv';
-import { Cache, GetSchema, Favourite } from '../util/types';
+import { Cache, GetSchema, Favourite, Favourites } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import validate from '../util/validator';
 import { createErrorResponse, createResponse } from '../util/responses';
@@ -57,14 +57,16 @@ const getFavouritesTrigger: AzureFunction = async function (
     if (!cache || cache.data === null) {
       context.log('no data in cache');
       context.log('getting dataStorage');
+      let favourites: Favourites;
       const dataStorage = await getDataStorage(req.params.id, context);
-      if (!dataStorage) {
-        context.res = createResponse(JSON.stringify([]));
-        return;
+      if (dataStorage) {
+        context.log('found datastorage');
+        favourites = await getFavourites(dataStorage.id);
+        filteredFavourites = filterFavourites(favourites, type);
+      } else {
+        favourites = {};
+        filteredFavourites = [];
       }
-      context.log('found datastorage');
-      const favourites = await getFavourites(dataStorage.id);
-      filteredFavourites = filterFavourites(favourites, type);
       context.log('caching data');
       await client.set(
         key,
