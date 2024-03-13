@@ -8,8 +8,6 @@ import { HsldIdOptions, Favourites } from '../util/types';
 import getAxios from '../util/axiosClient';
 import { getHslIdUrl, getManagementClientId } from '../util/helpers';
 
-let connectCount = 0;
-
 const makeHslIdRequest = async (
   options: HsldIdOptions,
 ): Promise<AxiosResponse> => {
@@ -35,16 +33,12 @@ export const getDataStorage = async (
     },
   };
   try {
-    connectCount = connectCount + 1;
-    context.log('Worker connections: ' + connectCount);
     const response = await makeHslIdRequest(options);
-    connectCount = connectCount - 1;
     const dataStorage = response.data?.resources?.[0];
     if (dataStorage) {
       return dataStorage;
     }
   } catch (err) {
-    connectCount = connectCount - 1;
     if (err?.response) {
       context.log.error(err.response.data);
       context.log.error(err.response.status);
