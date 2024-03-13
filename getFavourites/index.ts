@@ -77,9 +77,6 @@ const getFavouritesTrigger: AzureFunction = async function (
     } else {
       context.log('found data in cache');
       filteredFavourites = filterFavourites(cache.data, type);
-      if (typeof cache.data === 'object' && !Object.keys(cache.data).length) {
-        context.log('empty favourites in cache');
-      }
     }
     context.res = createResponse(JSON.stringify(filteredFavourites));
   } catch (err) {
