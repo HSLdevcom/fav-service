@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "functionTimeout": "00:00:20",
+  "functionTimeout": "00:00:40",
   "logging": {
     "fileLoggingMode": "always",
     "applicationInsights": {
