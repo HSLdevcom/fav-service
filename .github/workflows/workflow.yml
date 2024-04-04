@@ -81,9 +81,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'digitransit-dev2-fav-service'
-          slot-name: 'swap'
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_DEV_2024 }}
+          app-name: 'fa-favservice-dev-swec'
+          slot-name: 'pre-dev'
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_SWEDEN_DEV_2024 }}
           package: ./favservice.zip
 
       - name: "Deploy the zip to prod"
