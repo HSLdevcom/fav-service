@@ -81,8 +81,8 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'fa-favservice-dev-swec'
-          slot-name: 'pre-dev'
+          app-name: 'fa2-favservice-dev-swec'
+          slot-name: 'swap'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_SWEDEN_DEV_2024 }}
           package: ./favservice.zip
 
