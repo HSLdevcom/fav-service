@@ -75,7 +75,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
               properties: { type: { const: 'bikeStation' } },
             },
             then: {
-              required: ['type', 'lastUpdated', 'stationId', 'networks'],
+              required: ['type', 'lastUpdated', 'stationId'],
             },
           },
           {

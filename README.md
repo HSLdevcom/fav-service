@@ -220,9 +220,9 @@ example:
 {
   favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
   type: "bikeStation", required
-  stationId: string, required
+  stationId: string, required, in a feed scoped format <network>:<id>
   name: string, optional
-  networks: array<string>, required
+  networks: array<string>, deprecated. stationId contains the network name
   lastUpdated: number, required (unix time in seconds when favourite was last updated)
 }
 ```
