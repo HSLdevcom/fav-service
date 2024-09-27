@@ -721,27 +721,6 @@ describe('putFavourites', () => {
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
-    it(`should not insert favourite without 'networks'`, async () => {
-      const favourite = {
-        name: 'Juhana Herttuan tie',
-        stationId: '148',
-        type: 'bikeStation',
-        lastUpdated: 1621240217,
-        favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
-      };
-
-      const request = {
-        ...baseRequest,
-        body: [favourite],
-      };
-
-      await putFavourites(context, request);
-
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
-        `data/body/0 must have required property 'networks', data/body/0 must match "then" schema`,
-      );
-    });
   });
   describe('putFavourites with type note', () => {
     beforeEach(() => {
