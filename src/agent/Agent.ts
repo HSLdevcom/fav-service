@@ -1,5 +1,5 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { Context } from '@azure/functions';
+import { InvocationContext } from '@azure/functions';
 import Err from '../util/Err';
 import { HsldIdOptions, Favourites } from '../util/types';
 import getAxios from '../util/axiosClient';
@@ -17,7 +17,7 @@ const makeHslIdRequest = async (
 
 export const getDataStorage = async (
   id: string | undefined,
-  context: Context,
+  context: InvocationContext,
 ): Promise<{ [key: string]: string } | null> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
@@ -38,12 +38,12 @@ export const getDataStorage = async (
   } catch (err: unknown) {
     const error = err as AxiosError;
     if (error?.response) {
-      context.log.error(error.response.data);
-      context.log.error(error.response.status);
+      context.error(error.response.data);
+      context.error(error.response.status);
     } else if (error?.message) {
-      context.log.error(error.message);
+      context.error(error.message);
     } else {
-      context.log.error(error);
+      context.error(error);
     }
     if (error?.code === 'ECONNABORTED') {
       throw new Err(504, 'Datastorage timeout exceeded');
@@ -56,7 +56,7 @@ export const getDataStorage = async (
 
 export const createDataStorage = async (
   id: string | undefined,
-  context: Context,
+  context: InvocationContext,
 ): Promise<string> => {
   try {
     const managementClientId = getManagementClientId();
@@ -75,7 +75,7 @@ export const createDataStorage = async (
     const response = await makeHslIdRequest(options);
     return response.data.id;
   } catch (err) {
-    context.log.error(err);
+    context.error(err);
     throw new Err(500, `Creating datastorage failed`);
   }
 };
@@ -100,7 +100,7 @@ export const getFavourites = async (
 export const updateFavourites = async (
   dsId: string | undefined,
   favourites: Favourites,
-  context: Context,
+  context: InvocationContext,
 ): Promise<AxiosResponse> => {
   try {
     const options: HsldIdOptions = {
@@ -111,7 +111,7 @@ export const updateFavourites = async (
     const response = await makeHslIdRequest(options);
     return response;
   } catch (err) {
-    context.log.error(err);
+    context.error(err);
     throw new Err(500, `Updating datastorage failed`);
   }
 };
@@ -120,7 +120,7 @@ export const deleteFavourites = async (
   dsId: string | undefined,
   keys: Array<string>,
   store: string | undefined,
-  context: Context,
+  context: InvocationContext,
 ): Promise<Array<AxiosResponse<string> | AxiosError>> => {
   const responses: Array<AxiosResponse<string> | AxiosError> = [];
   for (let i = 0; i < keys.length; i++) {
@@ -132,7 +132,7 @@ export const deleteFavourites = async (
       };
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
-      context.log.error(err);
+      context.error(err);
       responses.push(err as AxiosError);
     }
   }
@@ -142,7 +142,7 @@ export const deleteFavourites = async (
 export const deleteExpiredNotes = async (
   dsId: string | undefined,
   favourites: Favourites,
-  context: Context,
+  context: InvocationContext,
 ): Promise<Array<AxiosResponse<string> | AxiosError>> => {
   let responses: Array<AxiosResponse<string> | AxiosError> = [];
   const expired: string[] = [];

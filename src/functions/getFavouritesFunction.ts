@@ -1,6 +1,11 @@
 import { JSONSchemaType } from 'ajv';
 import { Cache, GetSchema, Favourite, Favourites } from '../util/types';
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import {
+  app,
+  InvocationContext,
+  HttpRequest,
+  HttpResponseInit,
+} from '@azure/functions';
 import validate from '../util/validator';
 import { createErrorResponse, createResponse } from '../util/responses';
 import { getDataStorage, getFavourites } from '../agent/Agent';
@@ -22,13 +27,13 @@ const getSchema: JSONSchemaType<GetSchema> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const getFavouritesTrigger: AzureFunction = async function (
-  context: Context,
+export async function getFavouritesTrigger(
   req: HttpRequest,
-): Promise<void> {
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
   const userId = req?.params?.id;
-  const store = req?.query?.store;
-  const type = req?.query?.type;
+  const store = req?.query?.get('store') || undefined;
+  const type = req?.query?.get('type') || undefined;
   try {
     const schema: GetSchema = {
       hslId: userId,
@@ -36,8 +41,7 @@ const getFavouritesTrigger: AzureFunction = async function (
     };
     validate(getSchema, schema);
   } catch (err) {
-    context.res = createErrorResponse(<Err>err, context);
-    return;
+    return createErrorResponse(<Err>err, context);
   }
 
   const key = String(store ? `${store}-${userId}` : userId);
@@ -49,7 +53,7 @@ const getFavouritesTrigger: AzureFunction = async function (
     const data = String(await client.get(key));
     cache = { data: JSON.parse(data) };
   } catch (err) {
-    context.log.error(err); // redis IO error - not fatal, just log
+    context.error(err); // redis IO error - not fatal, just log
   }
 
   try {
@@ -78,10 +82,15 @@ const getFavouritesTrigger: AzureFunction = async function (
       context.log('found data in cache');
       filteredFavourites = filterFavourites(cache.data, type);
     }
-    context.res = createResponse(JSON.stringify(filteredFavourites));
+    return createResponse(filteredFavourites);
   } catch (err) {
-    context.res = createErrorResponse(<Err>err, context);
+    return createErrorResponse(<Err>err, context);
   }
-};
+}
 
-export default getFavouritesTrigger;
+app.http('getFavourites', {
+  methods: ['GET'],
+  authLevel: 'function',
+  handler: getFavouritesTrigger,
+  route: 'favorites/{id}',
+});

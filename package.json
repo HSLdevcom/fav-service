@@ -2,7 +2,7 @@
   "name": "favourites-ms",
   "version": "0.0.1",
   "description": "Favourites microservice for HSL",
-  "main": "index.js",
+  "main": "dist/src/functions/*.js",
   "repository": "https://github.com/HSLdevcom/fav-service",
   "author": "Krister Bäckman <krister.backman@digia.com>",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "uuid": "11.0.5"
   },
   "devDependencies": {
-    "@azure/functions": "^3.2.0",
+    "@azure/functions": "^4.7.0",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.25.1",
     "@types/ioredis-mock": "^8.2.5",

@@ -1,9 +1,13 @@
 import { JSONSchemaType } from 'ajv';
-import { AxiosResponse } from 'axios';
 import { createErrorResponse, createResponse } from '../util/responses';
 import validate from '../util/validator';
 import { DeleteSchema } from '../util/types';
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import {
+  app,
+  InvocationContext,
+  HttpRequest,
+  HttpResponseInit,
+} from '@azure/functions';
 import {
   deleteFavourites,
   getDataStorage,
@@ -31,16 +35,20 @@ const deleteSchema: JSONSchemaType<DeleteSchema> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
-const deleteFavouriteTrigger: AzureFunction = async function (
-  context: Context,
+export async function deleteFavouriteTrigger(
   req: HttpRequest,
-): Promise<void> {
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
   try {
     const userId = req?.params?.id;
-    const store = req?.query?.store;
-    const type = req?.query?.type;
+    const store = req?.query?.get('store') || undefined;
+    const type = req?.query?.get('type') || undefined;
+    if (!req.body) {
+      return { status: 400, body: 'Request has no body.' };
+    }
+    const data = (await req?.json()) as string[];
     const schema: DeleteSchema = {
-      body: req?.body,
+      body: data,
       hslId: userId,
       store: store && String(store),
     };
@@ -49,18 +57,17 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     context.log('getting dataStorage');
     const dataStorage = await getDataStorage(req.params.id, context);
     if (!dataStorage) {
-      context.res = createResponse(JSON.stringify([]));
-      return;
+      return createResponse([]);
     }
     context.log('deleting items');
     const hslidResponses = await deleteFavourites(
       dataStorage.id,
-      req?.body,
+      data,
       store,
       context,
     );
     context.log('deleted items');
-    const responses = req.body.map((key: string, i: number) => {
+    const responses = data.map((key: string, i: number) => {
       const response = hslidResponses[i];
       if (response && 'status' in response && 'statusText' in response) {
         return {
@@ -81,24 +88,29 @@ const deleteFavouriteTrigger: AzureFunction = async function (
       const client = getClient();
       await client.expire(String(key), 0);
     } catch (err) {
-      context.log.error(err); // redis IO error
+      context.error(err); // redis IO error
     }
     const deleteSuccessful = responses.every(
-      (response: AxiosResponse) => response.status === 204,
+      response => response.status === 204,
     );
     const favourites = await getFavourites(dataStorage.id);
     const filteredFavourites = filterFavourites(favourites, type);
     const responseBody = JSON.stringify(Object.values(filteredFavourites));
-    context.res = {
+    return {
       status: deleteSuccessful ? 200 : 400,
-      body: deleteSuccessful ? responseBody : responses,
+      jsonBody: deleteSuccessful ? responseBody : JSON.stringify(responses),
       headers: {
         'Content-Type': 'application/json',
       },
     };
   } catch (err) {
-    context.res = createErrorResponse(<Err>err, context);
+    return createErrorResponse(<Err>err, context);
   }
-};
+}
 
-export default deleteFavouriteTrigger;
+app.http('deleteFavourites', {
+  methods: ['DELETE'],
+  authLevel: 'function',
+  handler: deleteFavouriteTrigger,
+  route: 'favorites/{id}',
+});
