@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Favourites microservice for HSL",
   "main": "index.js",
-  "repository": "https://gitlab.hsl.fi/mobidigi/fav-service",
+  "repository": "https://github.com/HSLdevcom/fav-service",
   "author": "Krister Bäckman <krister.backman@digia.com>",
   "license": "MIT",
   "private": true,
