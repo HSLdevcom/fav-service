@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { JSONSchemaType } from 'ajv';
 import { Cache, GetSchema, Favourite, Favourites } from '../util/types';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';

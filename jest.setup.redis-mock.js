@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import RedisMock from 'ioredis-mock';
 import { jest } from '@jest/globals';
 

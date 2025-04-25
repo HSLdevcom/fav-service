@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { AxiosResponse, AxiosError } from 'axios';
 import { Context } from '@azure/functions';
 import Err from '../util/Err';
@@ -94,6 +91,7 @@ export const getFavourites = async (
     const response: AxiosResponse = await makeHslIdRequest(options);
     const favourites = response.data;
     return favourites;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return {};
   }

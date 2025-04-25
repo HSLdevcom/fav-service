@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import axios, { AxiosInstance } from 'axios';
 import Agent from 'agentkeepalive';
 import { getManagementClientCredentials } from './helpers';
