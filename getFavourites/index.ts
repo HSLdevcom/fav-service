@@ -7,6 +7,7 @@ import { createErrorResponse, createResponse } from '../util/responses';
 import { getDataStorage, getFavourites } from '../agent/Agent';
 import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
+import Err from '../util/Err';
 
 const getSchema: JSONSchemaType<GetSchema> = {
   type: 'object',
@@ -36,7 +37,7 @@ const getFavouritesTrigger: AzureFunction = async function (
     };
     validate(getSchema, schema);
   } catch (err) {
-    context.res = createErrorResponse(err, context);
+    context.res = createErrorResponse(<Err>err, context);
     return;
   }
 
@@ -80,7 +81,7 @@ const getFavouritesTrigger: AzureFunction = async function (
     }
     context.res = createResponse(JSON.stringify(filteredFavourites));
   } catch (err) {
-    context.res = createErrorResponse(err, context);
+    context.res = createErrorResponse(<Err>err, context);
   }
 };
 

@@ -1,5 +1,4 @@
 import { JSONSchemaType } from 'ajv';
-import { AxiosResponse } from 'axios';
 import { createErrorResponse } from '../util/responses';
 import validate from '../util/validator';
 import { Cache, Favourites, UpdateSchema } from '../util/types';
@@ -14,6 +13,7 @@ import {
 import mergeFavourites from '../util/mergeFavourites';
 import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
+import Err from '../util/Err';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -125,7 +125,7 @@ const expireNotes = async (
   const deleteResponses = await deleteExpiredNotes(dsId, favourites, context);
   if (deleteResponses.length > 0) {
     const deleteSuccessful = deleteResponses.every(
-      (response: AxiosResponse) => response.status === 204,
+      response => response.status === 204,
     );
     if (deleteSuccessful) {
       context.log('expired notes succesfully');
@@ -210,7 +210,7 @@ const putFavouritesTrigger: AzureFunction = async function (
       },
     };
   } catch (err) {
-    context.res = createErrorResponse(err, context);
+    context.res = createErrorResponse(<Err>err, context);
   }
 };
 

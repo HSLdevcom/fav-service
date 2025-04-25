@@ -11,6 +11,7 @@ import {
 } from '../agent/Agent';
 import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
+import Err from '../util/Err';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
   type: 'object',
@@ -60,11 +61,20 @@ const deleteFavouriteTrigger: AzureFunction = async function (
     );
     context.log('deleted items');
     const responses = req.body.map((key: string, i: number) => {
-      return {
-        key,
-        status: hslidResponses[i]?.status,
-        statusText: hslidResponses[i]?.statusText,
-      };
+      const response = hslidResponses[i];
+      if (response && 'status' in response && 'statusText' in response) {
+        return {
+          key,
+          status: hslidResponses[i]?.status,
+          statusText: response.statusText,
+        };
+      } else {
+        return {
+          key,
+          status: null,
+          statusText: 'Error',
+        };
+      }
     });
     try {
       // redis delete key from cache
@@ -87,7 +97,7 @@ const deleteFavouriteTrigger: AzureFunction = async function (
       },
     };
   } catch (err) {
-    context.res = createErrorResponse(err, context);
+    context.res = createErrorResponse(<Err>err, context);
   }
 };
 

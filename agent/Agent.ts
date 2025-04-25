@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosError } from 'axios';
 import { Context } from '@azure/functions';
 import Err from '../util/Err';
 import { HsldIdOptions, Favourites } from '../util/types';
@@ -38,16 +38,17 @@ export const getDataStorage = async (
     if (dataStorage) {
       return dataStorage;
     }
-  } catch (err) {
-    if (err?.response) {
-      context.log.error(err.response.data);
-      context.log.error(err.response.status);
-    } else if (err?.message) {
-      context.log.error(err.message);
+  } catch (err: unknown) {
+    const error = err as AxiosError;
+    if (error?.response) {
+      context.log.error(error.response.data);
+      context.log.error(error.response.status);
+    } else if (error?.message) {
+      context.log.error(error.message);
     } else {
-      context.log.error(err);
+      context.log.error(error);
     }
-    if (err?.code === 'ECONNABORTED') {
+    if (error?.code === 'ECONNABORTED') {
       throw new Err(504, 'Datastorage timeout exceeded');
     }
     throw new Err(404, 'Could not get datastorage');
@@ -122,8 +123,8 @@ export const deleteFavourites = async (
   keys: Array<string>,
   store: string | undefined,
   context: Context,
-): Promise<AxiosResponse<string>[]> => {
-  const responses = [];
+): Promise<Array<AxiosResponse<string> | AxiosError>> => {
+  const responses: Array<AxiosResponse<string> | AxiosError> = [];
   for (let i = 0; i < keys.length; i++) {
     try {
       const key = store ? `${store}-${keys[i]}` : keys[i];
@@ -134,7 +135,7 @@ export const deleteFavourites = async (
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
       context.log.error(err);
-      responses.push(err);
+      responses.push(err as AxiosError);
     }
   }
   return responses;
@@ -144,8 +145,8 @@ export const deleteExpiredNotes = async (
   dsId: string | undefined,
   favourites: Favourites,
   context: Context,
-): Promise<AxiosResponse<string>[]> => {
-  let responses = [];
+): Promise<Array<AxiosResponse<string> | AxiosError>> => {
+  let responses: Array<AxiosResponse<string> | AxiosError> = [];
   const expired: string[] = [];
   const keys = Object.keys(favourites);
   keys.forEach(key => {

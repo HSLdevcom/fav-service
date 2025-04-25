@@ -1,5 +1,5 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+export default {
   verbose: true,
   silent: true,
   preset: 'ts-jest',
@@ -11,4 +11,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   setupFilesAfterEnv: ['./jest.setup.redis-mock.js'],
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$',
+  transform: {},
 };

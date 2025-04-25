@@ -1,7 +1,7 @@
 import { Context } from '@azure/functions';
-import * as nock from 'nock';
+import nock from 'nock';
 import putFavourites from '.';
-import * as mockData from '../get_mock.json';
+import mockResponse from '../get_mock.json';
 import { Favourite } from '../util/types';
 
 const dataStorageNotFoundResponse = {
@@ -104,7 +104,7 @@ describe('putFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
     nock('http://localhost')
       .put('/api/rest/v1/datastorage/fafa/data')
@@ -179,7 +179,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -221,7 +221,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -251,7 +251,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -276,7 +276,7 @@ describe('putFavourites', () => {
       await putFavourites(context, request);
 
       const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
+      const expected = [...Object.values(mockResponse), favourite];
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
@@ -329,7 +329,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -357,7 +357,7 @@ describe('putFavourites', () => {
       await putFavourites(context, request);
 
       const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
+      const expected = [...Object.values(mockResponse), favourite];
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
@@ -420,7 +420,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -448,7 +448,7 @@ describe('putFavourites', () => {
       await putFavourites(context, request);
 
       const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
+      const expected = [...Object.values(mockResponse), favourite];
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
@@ -511,7 +511,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -539,7 +539,7 @@ describe('putFavourites', () => {
       await putFavourites(context, request);
 
       const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
+      const expected = [...Object.values(mockResponse), favourite];
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
@@ -649,7 +649,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -674,7 +674,7 @@ describe('putFavourites', () => {
       await putFavourites(context, request);
 
       const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
+      const expected = [...Object.values(mockResponse), favourite];
       expect(context?.res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
@@ -731,7 +731,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -829,7 +829,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -911,8 +911,8 @@ describe('putFavourites', () => {
     it('should reorder favourites', async () => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
-      const favourites = Object.values(mockData);
+        .reply(200, mockResponse);
+      const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
 
       const request = {
@@ -938,8 +938,8 @@ describe('putFavourites', () => {
       };
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, { ...mockData, ...postalCodeFav });
-      const favourites = Object.values(mockData);
+        .reply(200, { ...mockResponse, ...postalCodeFav });
+      const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
       const request = {
         ...baseRequest,

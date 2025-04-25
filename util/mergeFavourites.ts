@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import { Favourite, Favourites } from './types';
 import filterFavourites from './filterFavourites';
 
@@ -41,7 +41,7 @@ export default function mergeFavourites(
     } else if (favourite.favouriteId) {
       newData[`${prefix}${favourite.favouriteId}`] = favourite;
     } else {
-      const newFavourite = { ...favourite, favouriteId: uuid() };
+      const newFavourite = { ...favourite, favouriteId: uuidv4() };
       newData[`${prefix}${newFavourite.favouriteId}`] = newFavourite;
     }
   });

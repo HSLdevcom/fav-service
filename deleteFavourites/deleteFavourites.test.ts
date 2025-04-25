@@ -1,5 +1,5 @@
 import { Context } from '@azure/functions';
-import * as nock from 'nock';
+import nock from 'nock';
 import deleteFavourites from '.';
 
 const dataStorageFoundResponse = {

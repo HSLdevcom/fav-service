@@ -1,7 +1,7 @@
 import { Context } from '@azure/functions';
-import * as nock from 'nock';
+import nock from 'nock';
 import getFavourites from '.';
-import * as mockData from '../get_mock.json';
+import mockResponse from '../get_mock.json';
 
 const dataStorageNotFoundResponse = {
   message: 'User has no datastorage',
@@ -61,7 +61,7 @@ describe('getFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
     const request = {
       method: 'GET',
@@ -73,7 +73,7 @@ describe('getFavourites', () => {
       },
     };
     await getFavourites(context, request);
-    expect(JSON.parse(context?.res?.body)).toEqual(Object.values(mockData));
+    expect(JSON.parse(context?.res?.body)).toEqual(Object.values(mockResponse));
   });
   it(`should fail when param 'id' is not defined`, async () => {
     const request = {
@@ -105,7 +105,7 @@ describe('getFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
     const request = {
       method: 'GET',
@@ -120,7 +120,7 @@ describe('getFavourites', () => {
 
     await getFavourites(context, request);
 
-    const expected = Object.values(mockData)[0];
+    const expected = Object.values(mockResponse)[0];
     const body = JSON.parse(context?.res?.body);
     expect(context?.res?.status).toEqual(200);
     expect(body).toEqual([expected]);
