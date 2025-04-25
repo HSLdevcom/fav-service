@@ -8,3 +8,4 @@ test
 jest.config.js
 jest.setup.redis-mock.js
 get_mock.json
+eslint.config.mjs
