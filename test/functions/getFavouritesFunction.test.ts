@@ -1,7 +1,7 @@
-import { Context } from '@azure/functions';
-import * as nock from 'nock';
-import getFavourites from '.';
-import * as mockData from '../get_mock.json';
+import { InvocationContext, HttpRequest } from '@azure/functions';
+import nock from 'nock';
+import { getFavouritesTrigger } from '../../src/functions/getFavouritesFunction';
+import mockResponse from '../../get_mock.json';
 
 const dataStorageNotFoundResponse = {
   message: 'User has no datastorage',
@@ -15,15 +15,14 @@ const dataStorageFoundResponse = {
   ],
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockContext: any = { log: jest.fn() };
-mockContext.log.error = jest.fn();
-
 describe('getFavourites', () => {
-  let context: Context;
+  let context: InvocationContext;
 
   beforeEach(() => {
-    context = mockContext as unknown as Context;
+    context = new InvocationContext({
+      functionName: 'testGetFavourites',
+      invocationId: 'testInvocationId',
+    });
     process.env.hslIdUrl = 'http://localhost';
     process.env.clientId = '999';
     process.env.clientCredentials = 'Basic asdasd';
@@ -40,17 +39,18 @@ describe('getFavourites', () => {
       .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
       .reply(404, dataStorageNotFoundResponse);
 
-    const request = {
+    const request = new HttpRequest({
       method: 'GET',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
       query: {
         store: 'fav',
       },
-    };
-    await getFavourites(context, request);
-    expect(context?.res?.status).toEqual(404);
+    });
+    const res = await getFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(404);
   });
 
   it('should return favourites with existing hslid', async () => {
@@ -61,41 +61,42 @@ describe('getFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
-    const request = {
+    const request = new HttpRequest({
       method: 'GET',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
       query: {
         store: 'fav',
       },
-    };
-    await getFavourites(context, request);
-    expect(JSON.parse(context?.res?.body)).toEqual(Object.values(mockData));
+    });
+    const res = await getFavouritesTrigger(request, context);
+    expect(res?.jsonBody).toEqual(Object.values(mockResponse));
   });
   it(`should fail when param 'id' is not defined`, async () => {
-    const request = {
+    const request = new HttpRequest({
       method: 'GET',
+      url: 'http://localhost/favorites/foobar',
       query: {
         store: 'fav',
       },
-      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
-    };
-    await getFavourites(context, request);
-    expect(context?.res?.status).toEqual(400);
+    });
+    const res = await getFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(400);
   });
   it(`should fail when query 'store' is not defined`, async () => {
-    const request = {
+    const request = new HttpRequest({
       method: 'GET',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
-      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
-    };
-    await getFavourites(context, request);
-    expect(context?.res?.status).toEqual(400);
+    });
+    const res = await getFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(400);
   });
   it('should return only favourites by defined type in query', async () => {
     nock('http://localhost')
@@ -105,10 +106,11 @@ describe('getFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
-    const request = {
+    const request = new HttpRequest({
       method: 'GET',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
@@ -116,13 +118,13 @@ describe('getFavourites', () => {
         store: 'fav',
         type: 'route',
       },
-    };
+    });
 
-    await getFavourites(context, request);
+    const res = await getFavouritesTrigger(request, context);
 
-    const expected = Object.values(mockData)[0];
-    const body = JSON.parse(context?.res?.body);
-    expect(context?.res?.status).toEqual(200);
+    const expected = Object.values(mockResponse)[0];
+    const body = res?.jsonBody;
+    expect(res?.status).toEqual(200);
     expect(body).toEqual([expected]);
   });
 });

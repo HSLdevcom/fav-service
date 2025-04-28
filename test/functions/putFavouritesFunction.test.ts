@@ -1,8 +1,8 @@
-import { Context } from '@azure/functions';
-import * as nock from 'nock';
-import putFavourites from '.';
-import * as mockData from '../get_mock.json';
-import { Favourite } from '../util/types';
+import { InvocationContext, HttpRequest } from '@azure/functions';
+import nock from 'nock';
+import { putFavouritesTrigger } from '../../src/functions/putFavouritesFunction';
+import mockResponse from '../../get_mock.json';
+import { Favourite } from '../../src/util/types';
 
 const dataStorageNotFoundResponse = {
   message: 'Datastorage not found',
@@ -28,6 +28,7 @@ const dataStorageCreateResponse = {
 
 const baseRequest = {
   method: 'PUT',
+  url: 'http://localhost/favorites/foobar',
   params: {
     id: 'foobar',
   },
@@ -36,15 +37,14 @@ const baseRequest = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockContext: any = { log: jest.fn() };
-mockContext.log.error = jest.fn();
-
 describe('putFavourites', () => {
-  let context: Context;
+  let context: InvocationContext;
 
   beforeEach(() => {
-    context = mockContext as unknown as Context;
+    context = new InvocationContext({
+      functionName: 'testPutFavourites',
+      invocationId: 'testInvocationId',
+    });
     process.env.hslIdUrl = 'http://localhost';
     process.env.clientId = '999';
     process.env.clientCredentials = 'Basic asdasd';
@@ -79,15 +79,15 @@ describe('putFavourites', () => {
       .get('/api/rest/v1/datastorage/fafa/data')
       .reply(200, []);
 
-    const request = {
+    const request = new HttpRequest({
       ...baseRequest,
-      body: [favourite],
-    };
+      body: { string: JSON.stringify([favourite]) },
+    });
 
-    await putFavourites(context, request);
-    const body = JSON.parse(context?.res?.body);
+    const res = await putFavouritesTrigger(request, context);
+    const body = res?.jsonBody;
 
-    expect(context?.res?.status).toEqual(200);
+    expect(res?.status).toEqual(200);
     expect(body).toEqual([favourite]);
   });
 
@@ -104,56 +104,59 @@ describe('putFavourites', () => {
 
     nock('http://localhost')
       .get('/api/rest/v1/datastorage/fafa/data')
-      .reply(200, mockData);
+      .reply(200, mockResponse);
 
     nock('http://localhost')
       .put('/api/rest/v1/datastorage/fafa/data')
       .reply(200, {});
 
-    const request = {
+    const request = new HttpRequest({
       ...baseRequest,
-      body: [favourite],
-    };
+      body: { string: JSON.stringify([favourite]) },
+    });
 
-    await putFavourites(context, request);
+    const res = await putFavouritesTrigger(request, context);
 
-    expect(context?.res?.status).toEqual(400);
+    expect(res?.status).toEqual(400);
   });
 
   it(`should fail when param 'id' is not defined`, async () => {
-    const request = {
+    const request = new HttpRequest({
       method: 'PUT',
+      url: 'http://localhost/favorites/foobar',
       query: {
         store: 'fav',
       },
-      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
-    };
-    await putFavourites(context, request);
-    expect(context?.res?.status).toEqual(400);
+      body: { string: '["9ae46b13-c8ad-480d-8d6d-e0274f3e8b42"]' },
+    });
+    const res = await putFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(400);
   });
   it(`should fail when query 'store' is not defined`, async () => {
-    const request = {
+    const request = new HttpRequest({
       method: 'PUT',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
-      body: ['9ae46b13-c8ad-480d-8d6d-e0274f3e8b42'],
-    };
-    await putFavourites(context, request);
-    expect(context?.res?.status).toEqual(400);
+      body: { string: '["9ae46b13-c8ad-480d-8d6d-e0274f3e8b42"]' },
+    });
+    const res = await putFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(400);
   });
   it(`should fail when request 'body' is not defined`, async () => {
-    const request = {
+    const request = new HttpRequest({
       method: 'PUT',
+      url: 'http://localhost/favorites/foobar',
       params: {
         id: 'foobar',
       },
       query: {
         store: 'fav',
       },
-    };
-    await putFavourites(context, request);
-    expect(context?.res?.status).toEqual(400);
+    });
+    const res = await putFavouritesTrigger(request, context);
+    expect(res?.status).toEqual(400);
   });
 
   describe('update existing favourite', () => {
@@ -179,24 +182,24 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
         .reply(204, {});
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const updated = JSON.parse(context?.res?.body).find(
+      const updated = res?.jsonBody.find(
         (elem: Favourite) =>
           elem?.favouriteId === 'e2853d81-56a9-4024-bab0-dd7f59870560',
       );
-      expect(context?.res?.status).toEqual(200);
+      expect(res?.status).toEqual(200);
       expect(updated).toEqual(favourite);
     });
     it(`should not update existing favourite if new favourite has smaller 'lastUpdated value'`, async () => {
@@ -221,24 +224,24 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
         .reply(204, {});
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const updated = JSON.parse(context?.res?.body).find(
+      const updated = res?.jsonBody.find(
         (elem: Favourite) =>
           elem?.favouriteId === 'e2853d81-56a9-4024-bab0-dd7f59870560',
       );
-      expect(context?.res?.status).toEqual(200);
+      expect(res?.status).toEqual(200);
       expect(updated.name).toEqual('Pasila');
     });
   });
@@ -251,7 +254,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -268,16 +271,16 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      const expected = [...Object.values(mockResponse), favourite];
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -288,15 +291,15 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'gtfsId', data/body/0 must match "then" schema`,
       );
     });
@@ -307,15 +310,15 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -329,7 +332,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -349,16 +352,16 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      const expected = [...Object.values(mockResponse), favourite];
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -374,15 +377,15 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'gtfsId', data/body/0 must match "then" schema`,
       );
     });
@@ -398,15 +401,15 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -420,7 +423,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -440,16 +443,16 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      const expected = [...Object.values(mockResponse), favourite];
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -465,15 +468,15 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'gtfsId', data/body/0 must match "then" schema`,
       );
     });
@@ -489,15 +492,15 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -511,7 +514,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -531,16 +534,16 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      const expected = [...Object.values(mockResponse), favourite];
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -556,15 +559,15 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'address', data/body/0 must match "then" schema`,
       );
     });
@@ -580,15 +583,15 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lat', data/body/0 must match "then" schema`,
       );
     });
@@ -604,15 +607,15 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lon', data/body/0 must match "then" schema`,
       );
     });
@@ -627,15 +630,15 @@ describe('putFavourites', () => {
         type: 'place',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -649,7 +652,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -666,16 +669,16 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      const expected = [...Object.values(mockData), favourite];
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      const expected = [...Object.values(mockResponse), favourite];
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -688,15 +691,15 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'stationId', data/body/0 must match "then" schema`,
       );
     });
@@ -709,15 +712,15 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -731,7 +734,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -749,19 +752,19 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
         noteId: '123',
       };
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
           type: 'note',
         },
-        body: [note],
-      };
+        body: { string: JSON.stringify([note]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      expect(res?.status).toEqual(200);
       expect(body).toEqual([note]);
     });
     it(`should not insert note without 'noteId'`, async () => {
@@ -769,15 +772,15 @@ describe('putFavourites', () => {
         type: 'note',
         expires: 9999999999,
       };
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [note],
-      };
+        body: { string: JSON.stringify([note]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'noteId', data/body/0 must match "then" schema`,
       );
     });
@@ -786,15 +789,15 @@ describe('putFavourites', () => {
         type: 'note',
         noteId: '123',
       };
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [note],
-      };
+        body: { string: JSON.stringify([note]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'expires', data/body/0 must match "then" schema`,
       );
     });
@@ -804,19 +807,19 @@ describe('putFavourites', () => {
         expires: 0,
         noteId: '123',
       };
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
           type: 'note',
         },
-        body: [note],
-      };
+        body: { string: JSON.stringify([note]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+      expect(res?.status).toEqual(200);
       expect(body).toEqual([]);
     });
   });
@@ -829,7 +832,7 @@ describe('putFavourites', () => {
 
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
+        .reply(200, mockResponse);
 
       nock('http://localhost')
         .put('/api/rest/v1/datastorage/fafa/data')
@@ -844,20 +847,20 @@ describe('putFavourites', () => {
         favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
           type: 'postalCode',
         },
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
+      const body = res?.jsonBody;
       const expected = [favourite];
-      expect(context?.res?.status).toEqual(200);
+      expect(res?.status).toEqual(200);
       expect(body).toEqual(expected);
     });
 
@@ -867,15 +870,15 @@ describe('putFavourites', () => {
         lastUpdated: 1620732626,
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'postalCode', data/body/0 must match "then" schema`,
       );
     });
@@ -885,15 +888,15 @@ describe('putFavourites', () => {
         type: 'postalCode',
       };
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: [favourite],
-      };
+        body: { string: JSON.stringify([favourite]) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(400);
-      expect(context?.res?.body).toEqual(
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
         `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
       );
     });
@@ -911,20 +914,20 @@ describe('putFavourites', () => {
     it('should reorder favourites', async () => {
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, mockData);
-      const favourites = Object.values(mockData);
+        .reply(200, mockResponse);
+      const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
 
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: newOrder,
-      };
+        body: { string: JSON.stringify(newOrder) },
+      });
 
-      await putFavourites(context, request);
+      const res = await putFavouritesTrigger(request, context);
 
-      const body = JSON.parse(context?.res?.body);
+      const body = res?.jsonBody;
 
-      expect(context?.res?.status).toEqual(200);
+      expect(res?.status).toEqual(200);
       expect(body.slice(-1)[0]).toEqual(favourites[0]);
     });
     it('should reorder favourites when there are also non default typed favourite saved', async () => {
@@ -938,18 +941,19 @@ describe('putFavourites', () => {
       };
       nock('http://localhost')
         .get('/api/rest/v1/datastorage/fafa/data')
-        .reply(200, { ...mockData, ...postalCodeFav });
-      const favourites = Object.values(mockData);
+        .reply(200, { ...mockResponse, ...postalCodeFav });
+      const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
-      const request = {
+      const request = new HttpRequest({
         ...baseRequest,
-        body: newOrder,
-      };
+        body: { string: JSON.stringify(newOrder) },
+      });
 
-      await putFavourites(context, request);
-      const body = JSON.parse(context?.res?.body);
+      const res = await putFavouritesTrigger(request, context);
 
-      expect(context?.res?.status).toEqual(200);
+      const body = res?.jsonBody;
+
+      expect(res?.status).toEqual(200);
       expect(body.slice(-1)[0]).toEqual(favourites[0]);
     });
   });

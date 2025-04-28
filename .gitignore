@@ -29,3 +29,5 @@ node_modules
 requests/
 
 .vscode/*
+
+dist

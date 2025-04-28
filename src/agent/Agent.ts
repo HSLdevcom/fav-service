@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import { AxiosResponse } from 'axios';
-import { Context } from '@azure/functions';
+import { AxiosResponse, AxiosError } from 'axios';
+import { InvocationContext } from '@azure/functions';
 import Err from '../util/Err';
 import { HsldIdOptions, Favourites } from '../util/types';
 import getAxios from '../util/axiosClient';
@@ -20,7 +17,7 @@ const makeHslIdRequest = async (
 
 export const getDataStorage = async (
   id: string | undefined,
-  context: Context,
+  context: InvocationContext,
 ): Promise<{ [key: string]: string } | null> => {
   const managementClientId = getManagementClientId();
   const options: HsldIdOptions = {
@@ -38,16 +35,17 @@ export const getDataStorage = async (
     if (dataStorage) {
       return dataStorage;
     }
-  } catch (err) {
-    if (err?.response) {
-      context.log.error(err.response.data);
-      context.log.error(err.response.status);
-    } else if (err?.message) {
-      context.log.error(err.message);
+  } catch (err: unknown) {
+    const error = err as AxiosError;
+    if (error?.response) {
+      context.error(error.response.data);
+      context.error(error.response.status);
+    } else if (error?.message) {
+      context.error(error.message);
     } else {
-      context.log.error(err);
+      context.error(error);
     }
-    if (err?.code === 'ECONNABORTED') {
+    if (error?.code === 'ECONNABORTED') {
       throw new Err(504, 'Datastorage timeout exceeded');
     }
     throw new Err(404, 'Could not get datastorage');
@@ -58,7 +56,7 @@ export const getDataStorage = async (
 
 export const createDataStorage = async (
   id: string | undefined,
-  context: Context,
+  context: InvocationContext,
 ): Promise<string> => {
   try {
     const managementClientId = getManagementClientId();
@@ -77,7 +75,7 @@ export const createDataStorage = async (
     const response = await makeHslIdRequest(options);
     return response.data.id;
   } catch (err) {
-    context.log.error(err);
+    context.error(err);
     throw new Err(500, `Creating datastorage failed`);
   }
 };
@@ -93,6 +91,7 @@ export const getFavourites = async (
     const response: AxiosResponse = await makeHslIdRequest(options);
     const favourites = response.data;
     return favourites;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return {};
   }
@@ -101,7 +100,7 @@ export const getFavourites = async (
 export const updateFavourites = async (
   dsId: string | undefined,
   favourites: Favourites,
-  context: Context,
+  context: InvocationContext,
 ): Promise<AxiosResponse> => {
   try {
     const options: HsldIdOptions = {
@@ -112,7 +111,7 @@ export const updateFavourites = async (
     const response = await makeHslIdRequest(options);
     return response;
   } catch (err) {
-    context.log.error(err);
+    context.error(err);
     throw new Err(500, `Updating datastorage failed`);
   }
 };
@@ -121,9 +120,9 @@ export const deleteFavourites = async (
   dsId: string | undefined,
   keys: Array<string>,
   store: string | undefined,
-  context: Context,
-): Promise<AxiosResponse<string>[]> => {
-  const responses = [];
+  context: InvocationContext,
+): Promise<Array<AxiosResponse<string> | AxiosError>> => {
+  const responses: Array<AxiosResponse<string> | AxiosError> = [];
   for (let i = 0; i < keys.length; i++) {
     try {
       const key = store ? `${store}-${keys[i]}` : keys[i];
@@ -133,8 +132,8 @@ export const deleteFavourites = async (
       };
       responses.push(await makeHslIdRequest(options));
     } catch (err) {
-      context.log.error(err);
-      responses.push(err);
+      context.error(err);
+      responses.push(err as AxiosError);
     }
   }
   return responses;
@@ -143,9 +142,9 @@ export const deleteFavourites = async (
 export const deleteExpiredNotes = async (
   dsId: string | undefined,
   favourites: Favourites,
-  context: Context,
-): Promise<AxiosResponse<string>[]> => {
-  let responses = [];
+  context: InvocationContext,
+): Promise<Array<AxiosResponse<string> | AxiosError>> => {
+  let responses: Array<AxiosResponse<string> | AxiosError> = [];
   const expired: string[] = [];
   const keys = Object.keys(favourites);
   keys.forEach(key => {

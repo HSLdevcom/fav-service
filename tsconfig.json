@@ -9,6 +9,7 @@
     "outDir": "dist",
     "sourceMap": false,
     "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "**/*.test.ts"],
 }

@@ -1,9 +1,13 @@
 import { JSONSchemaType } from 'ajv';
-import { AxiosResponse } from 'axios';
 import { createErrorResponse } from '../util/responses';
 import validate from '../util/validator';
-import { Cache, Favourites, UpdateSchema } from '../util/types';
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { Cache, Favourites, Favourite, UpdateSchema } from '../util/types';
+import {
+  app,
+  InvocationContext,
+  HttpRequest,
+  HttpResponseInit,
+} from '@azure/functions';
 import {
   getFavourites,
   updateFavourites,
@@ -14,6 +18,7 @@ import {
 import mergeFavourites from '../util/mergeFavourites';
 import filterFavourites from '../util/filterFavourites';
 import getClient from '../util/redisClient';
+import Err from '../util/Err';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -110,7 +115,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
 } as any;
 
 const expireNotes = async (
-  context: Context,
+  context: InvocationContext,
   dsId: string,
   favourites: Favourites,
 ): Promise<void> => {
@@ -125,28 +130,32 @@ const expireNotes = async (
   const deleteResponses = await deleteExpiredNotes(dsId, favourites, context);
   if (deleteResponses.length > 0) {
     const deleteSuccessful = deleteResponses.every(
-      (response: AxiosResponse) => response.status === 204,
+      response => response.status === 204,
     );
     if (deleteSuccessful) {
       context.log('expired notes succesfully');
     } else {
-      context.log.error('expiring notes failed');
+      context.error('expiring notes failed');
     }
   }
 };
 
-const putFavouritesTrigger: AzureFunction = async function (
-  context: Context,
+export async function putFavouritesTrigger(
   req: HttpRequest,
-): Promise<void> {
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
   try {
     const userId = req?.params?.id;
-    const store = req?.query?.store;
-    const type = req?.query?.type;
+    const store = req?.query?.get('store');
+    const type = req?.query?.get('type') || undefined;
+    if (!req.body) {
+      return { status: 400, body: 'Request has no body.' };
+    }
+    const data = (await req?.json()) as Favourite[];
     const schema: UpdateSchema = {
-      body: req?.body,
+      body: data,
       hslId: userId,
-      store: store && String(store),
+      store: store ? String(store) : undefined,
     };
     validate(updateSchema, schema);
     const dataStorage = {
@@ -164,7 +173,7 @@ const putFavouritesTrigger: AzureFunction = async function (
         context.log('datastorage created');
         dataStorage.id = newDataStorage;
       } catch (err) {
-        context.log.error('something went wrong creating datastorage');
+        context.error('something went wrong creating datastorage');
         throw err;
       }
     }
@@ -174,7 +183,7 @@ const putFavouritesTrigger: AzureFunction = async function (
     context.log('merging favourites with current ones');
     const mergedFavourites = await mergeFavourites(
       currentFavourites,
-      req.body,
+      data,
       String(store),
     );
     await expireNotes(context, dataStorage.id, mergedFavourites);
@@ -195,23 +204,26 @@ const putFavouritesTrigger: AzureFunction = async function (
         60 * 60 * 24 * 14,
       );
     } catch (err) {
-      context.log.error(err); // redis IO error
+      context.error(err); // redis IO error
     }
     const filteredFavourites = filterFavourites(mergedFavourites, type);
     const statusCode = response.status === 204 ? 200 : response.status;
-    const responseBody: string = JSON.stringify(
-      Object.values(filteredFavourites),
-    );
-    context.res = {
+    const responseBody = Object.values(filteredFavourites);
+    return {
       status: statusCode,
-      body: statusCode > 204 ? response.data : responseBody,
+      jsonBody: statusCode > 204 ? response.data : responseBody,
       headers: {
         'Content-Type': 'application/json',
       },
     };
   } catch (err) {
-    context.res = createErrorResponse(err, context);
+    return createErrorResponse(<Err>err, context);
   }
-};
+}
 
-export default putFavouritesTrigger;
+app.http('putFavourites', {
+  methods: ['PUT'],
+  authLevel: 'function',
+  handler: putFavouritesTrigger,
+  route: 'favorites/{id}',
+});

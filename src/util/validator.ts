@@ -6,8 +6,7 @@ const ajv = new Ajv({ allErrors: true });
 
 addFormats(ajv);
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export default function validate(schema: Object, data: Object): void {
+export default function validate(schema: object, data: object): void {
   const validate = ajv.compile(schema);
   const valid = validate(data);
 
