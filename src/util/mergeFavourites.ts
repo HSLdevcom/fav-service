@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Favourite, Favourites } from './types';
-import filterFavourites from './filterFavourites';
+import { Favourite, Favourites } from './types.js';
+import filterFavourites from './filterFavourites.js';
 
 export default function mergeFavourites(
   currentFavourites: Favourites,

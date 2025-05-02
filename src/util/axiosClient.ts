@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import Agent from 'agentkeepalive';
-import { getManagementClientCredentials } from './helpers';
+import { getManagementClientCredentials } from './helpers.js';
 
 let client: AxiosInstance;
 

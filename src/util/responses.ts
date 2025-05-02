@@ -1,5 +1,5 @@
 import { InvocationContext } from '@azure/functions';
-import Err from './Err';
+import Err from './Err.js';
 
 interface Response {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

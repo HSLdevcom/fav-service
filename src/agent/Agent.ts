@@ -1,9 +1,9 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { InvocationContext } from '@azure/functions';
-import Err from '../util/Err';
-import { HsldIdOptions, Favourites } from '../util/types';
-import getAxios from '../util/axiosClient';
-import { getHslIdUrl, getManagementClientId } from '../util/helpers';
+import Err from '../util/Err.js';
+import { HsldIdOptions, Favourites } from '../util/types.js';
+import getAxios from '../util/axiosClient.js';
+import { getHslIdUrl, getManagementClientId } from '../util/helpers.js';
 
 const makeHslIdRequest = async (
   options: HsldIdOptions,

@@ -1,24 +1,19 @@
 import { JSONSchemaType } from 'ajv';
-import { createErrorResponse } from '../util/responses';
-import validate from '../util/validator';
-import { Cache, Favourites, Favourite, UpdateSchema } from '../util/types';
-import {
-  app,
-  InvocationContext,
-  HttpRequest,
-  HttpResponseInit,
-} from '@azure/functions';
+import { createErrorResponse } from '../util/responses.js';
+import validate from '../util/validator.js';
+import { Cache, Favourites, Favourite, UpdateSchema } from '../util/types.js';
+import functions from '@azure/functions';
 import {
   getFavourites,
   updateFavourites,
   getDataStorage,
   createDataStorage,
   deleteExpiredNotes,
-} from '../agent/Agent';
-import mergeFavourites from '../util/mergeFavourites';
-import filterFavourites from '../util/filterFavourites';
-import getClient from '../util/redisClient';
-import Err from '../util/Err';
+} from '../agent/Agent.js';
+import mergeFavourites from '../util/mergeFavourites.js';
+import filterFavourites from '../util/filterFavourites.js';
+import getClient from '../util/redisClient.js';
+import Err from '../util/Err.js';
 
 const updateSchema: JSONSchemaType<UpdateSchema> = {
   type: 'object',
@@ -115,7 +110,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
 } as any;
 
 const expireNotes = async (
-  context: InvocationContext,
+  context: functions.InvocationContext,
   dsId: string,
   favourites: Favourites,
 ): Promise<void> => {
@@ -141,9 +136,9 @@ const expireNotes = async (
 };
 
 export async function putFavouritesTrigger(
-  req: HttpRequest,
-  context: InvocationContext,
-): Promise<HttpResponseInit> {
+  req: functions.HttpRequest,
+  context: functions.InvocationContext,
+): Promise<functions.HttpResponseInit> {
   try {
     const userId = req?.params?.id;
     const store = req?.query?.get('store');
@@ -221,7 +216,7 @@ export async function putFavouritesTrigger(
   }
 }
 
-app.http('putFavourites', {
+functions.app.http('putFavourites', {
   methods: ['PUT'],
   authLevel: 'function',
   handler: putFavouritesTrigger,

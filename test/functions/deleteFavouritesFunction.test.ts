@@ -1,6 +1,6 @@
-import { InvocationContext, HttpRequest } from '@azure/functions';
+import functions from '@azure/functions';
 import nock from 'nock';
-import { deleteFavouriteTrigger } from '../../src/functions/deleteFavouritesFunction';
+import { deleteFavouriteTrigger } from '../../src/functions/deleteFavouritesFunction.ts';
 
 const dataStorageFoundResponse = {
   resources: [
@@ -24,10 +24,10 @@ const fav = {
 };
 
 describe('deleteFavourites', () => {
-  let context: InvocationContext;
+  let context: functions.InvocationContext;
 
   beforeEach(() => {
-    context = new InvocationContext({
+    context = new functions.InvocationContext({
       functionName: 'testDeleteFavourites',
       invocationId: 'testInvocationId',
     });
@@ -53,7 +53,7 @@ describe('deleteFavourites', () => {
       .get('/api/rest/v1/datastorage/fafa/data')
       .reply(200, {});
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'DELETE',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -69,7 +69,7 @@ describe('deleteFavourites', () => {
     expect(res?.jsonBody).toEqual('[]');
   });
   it(`should fail when param 'id' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'DELETE',
       url: 'http://localhost/favorites/foobar',
       query: {
@@ -81,7 +81,7 @@ describe('deleteFavourites', () => {
     expect(res?.status).toEqual(400);
   });
   it(`should fail when query 'store' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'DELETE',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -93,7 +93,7 @@ describe('deleteFavourites', () => {
     expect(res?.status).toEqual(400);
   });
   it(`should fail when request 'body' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'DELETE',
       url: 'http://localhost/favorites/foobar',
       params: {

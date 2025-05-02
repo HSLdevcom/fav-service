@@ -1,6 +1,7 @@
-import Err from './Err';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+import Err from './Err.js';
+import { Ajv } from 'ajv';
+import _addFormats from 'ajv-formats';
+const addFormats = _addFormats as unknown as typeof _addFormats.default;
 
 const ajv = new Ajv({ allErrors: true });
 

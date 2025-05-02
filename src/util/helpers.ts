@@ -1,4 +1,4 @@
-import Err from './Err';
+import Err from './Err.js';
 
 const validateEnv = (variable: string | undefined) => {
   if (typeof variable === 'undefined') {

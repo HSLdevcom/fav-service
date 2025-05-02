@@ -1,8 +1,8 @@
-import { InvocationContext, HttpRequest } from '@azure/functions';
+import functions from '@azure/functions';
 import nock from 'nock';
-import { putFavouritesTrigger } from '../../src/functions/putFavouritesFunction';
+import { putFavouritesTrigger } from '../../src/functions/putFavouritesFunction.ts';
 import mockResponse from '../../get_mock.json';
-import { Favourite } from '../../src/util/types';
+import { Favourite } from '../../src/util/types.js';
 
 const dataStorageNotFoundResponse = {
   message: 'Datastorage not found',
@@ -38,10 +38,10 @@ const baseRequest = {
 };
 
 describe('putFavourites', () => {
-  let context: InvocationContext;
+  let context: functions.InvocationContext;
 
   beforeEach(() => {
-    context = new InvocationContext({
+    context = new functions.InvocationContext({
       functionName: 'testPutFavourites',
       invocationId: 'testInvocationId',
     });
@@ -79,7 +79,7 @@ describe('putFavourites', () => {
       .get('/api/rest/v1/datastorage/fafa/data')
       .reply(200, []);
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       ...baseRequest,
       body: { string: JSON.stringify([favourite]) },
     });
@@ -110,7 +110,7 @@ describe('putFavourites', () => {
       .put('/api/rest/v1/datastorage/fafa/data')
       .reply(200, {});
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       ...baseRequest,
       body: { string: JSON.stringify([favourite]) },
     });
@@ -121,7 +121,7 @@ describe('putFavourites', () => {
   });
 
   it(`should fail when param 'id' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'PUT',
       url: 'http://localhost/favorites/foobar',
       query: {
@@ -133,7 +133,7 @@ describe('putFavourites', () => {
     expect(res?.status).toEqual(400);
   });
   it(`should fail when query 'store' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'PUT',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -145,7 +145,7 @@ describe('putFavourites', () => {
     expect(res?.status).toEqual(400);
   });
   it(`should fail when request 'body' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'PUT',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -188,7 +188,7 @@ describe('putFavourites', () => {
         .put('/api/rest/v1/datastorage/fafa/data')
         .reply(204, {});
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -230,7 +230,7 @@ describe('putFavourites', () => {
         .put('/api/rest/v1/datastorage/fafa/data')
         .reply(204, {});
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -271,7 +271,7 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -291,7 +291,7 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -310,7 +310,7 @@ describe('putFavourites', () => {
         favouriteId: '9ae46b13-c8ad-480d-8d6d-e0274f3e8b42',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -352,7 +352,7 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -377,7 +377,7 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -401,7 +401,7 @@ describe('putFavourites', () => {
         favouriteId: '85500469-de49-4726-b27d-cd09dbbc1b17',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -443,7 +443,7 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -468,7 +468,7 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -492,7 +492,7 @@ describe('putFavourites', () => {
         favouriteId: 'd629133f-5153-486e-86d8-80362fc2d4cb',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -534,7 +534,7 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -559,7 +559,7 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -583,7 +583,7 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -607,7 +607,7 @@ describe('putFavourites', () => {
         favouriteId: 'a66d4946-def6-4434-b738-3945da9fd74d',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -630,7 +630,7 @@ describe('putFavourites', () => {
         type: 'place',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -669,7 +669,7 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -691,7 +691,7 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -712,7 +712,7 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da6',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -752,7 +752,7 @@ describe('putFavourites', () => {
         favouriteId: '6ae991cd-f45d-4711-b853-7344a6961da7',
         noteId: '123',
       };
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
@@ -772,7 +772,7 @@ describe('putFavourites', () => {
         type: 'note',
         expires: 9999999999,
       };
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([note]) },
       });
@@ -789,7 +789,7 @@ describe('putFavourites', () => {
         type: 'note',
         noteId: '123',
       };
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([note]) },
       });
@@ -807,7 +807,7 @@ describe('putFavourites', () => {
         expires: 0,
         noteId: '123',
       };
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
@@ -847,7 +847,7 @@ describe('putFavourites', () => {
         favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         query: {
           ...baseRequest.query,
@@ -870,7 +870,7 @@ describe('putFavourites', () => {
         lastUpdated: 1620732626,
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -888,7 +888,7 @@ describe('putFavourites', () => {
         type: 'postalCode',
       };
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify([favourite]) },
       });
@@ -918,7 +918,7 @@ describe('putFavourites', () => {
       const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
 
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify(newOrder) },
       });
@@ -944,7 +944,7 @@ describe('putFavourites', () => {
         .reply(200, { ...mockResponse, ...postalCodeFav });
       const favourites = Object.values(mockResponse);
       const newOrder = [...favourites.slice(1), favourites[0]];
-      const request = new HttpRequest({
+      const request = new functions.HttpRequest({
         ...baseRequest,
         body: { string: JSON.stringify(newOrder) },
       });
