@@ -1,7 +1,9 @@
 import RedisMock from 'ioredis-mock';
 import { jest } from '@jest/globals';
 
-jest.mock('ioredis', () => jest.requireActual('ioredis-mock'));
+jest.unstable_mockModule('ioredis', async () => ({
+  Redis: RedisMock,
+}));
 
 // eslint-disable-next-line
 const redis = new RedisMock({

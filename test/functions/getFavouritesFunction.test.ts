@@ -1,6 +1,6 @@
-import { InvocationContext, HttpRequest } from '@azure/functions';
+import functions from '@azure/functions';
 import nock from 'nock';
-import { getFavouritesTrigger } from '../../src/functions/getFavouritesFunction';
+import { getFavouritesTrigger } from '../../src/functions/getFavouritesFunction.ts';
 import mockResponse from '../../get_mock.json';
 
 const dataStorageNotFoundResponse = {
@@ -16,10 +16,10 @@ const dataStorageFoundResponse = {
 };
 
 describe('getFavourites', () => {
-  let context: InvocationContext;
+  let context: functions.InvocationContext;
 
   beforeEach(() => {
-    context = new InvocationContext({
+    context = new functions.InvocationContext({
       functionName: 'testGetFavourites',
       invocationId: 'testInvocationId',
     });
@@ -39,7 +39,7 @@ describe('getFavourites', () => {
       .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
       .reply(404, dataStorageNotFoundResponse);
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'GET',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -63,7 +63,7 @@ describe('getFavourites', () => {
       .get('/api/rest/v1/datastorage/fafa/data')
       .reply(200, mockResponse);
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'GET',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -77,7 +77,7 @@ describe('getFavourites', () => {
     expect(res?.jsonBody).toEqual(Object.values(mockResponse));
   });
   it(`should fail when param 'id' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'GET',
       url: 'http://localhost/favorites/foobar',
       query: {
@@ -88,7 +88,7 @@ describe('getFavourites', () => {
     expect(res?.status).toEqual(400);
   });
   it(`should fail when query 'store' is not defined`, async () => {
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'GET',
       url: 'http://localhost/favorites/foobar',
       params: {
@@ -108,7 +108,7 @@ describe('getFavourites', () => {
       .get('/api/rest/v1/datastorage/fafa/data')
       .reply(200, mockResponse);
 
-    const request = new HttpRequest({
+    const request = new functions.HttpRequest({
       method: 'GET',
       url: 'http://localhost/favorites/foobar',
       params: {

@@ -1,21 +1,16 @@
 import { JSONSchemaType } from 'ajv';
-import { createErrorResponse, createResponse } from '../util/responses';
-import validate from '../util/validator';
-import { DeleteSchema } from '../util/types';
-import {
-  app,
-  InvocationContext,
-  HttpRequest,
-  HttpResponseInit,
-} from '@azure/functions';
+import { createErrorResponse, createResponse } from '../util/responses.js';
+import validate from '../util/validator.js';
+import { DeleteSchema } from '../util/types.js';
+import functions from '@azure/functions';
 import {
   deleteFavourites,
   getDataStorage,
   getFavourites,
-} from '../agent/Agent';
-import filterFavourites from '../util/filterFavourites';
-import getClient from '../util/redisClient';
-import Err from '../util/Err';
+} from '../agent/Agent.js';
+import filterFavourites from '../util/filterFavourites.js';
+import getClient from '../util/redisClient.js';
+import Err from '../util/Err.js';
 
 const deleteSchema: JSONSchemaType<DeleteSchema> = {
   type: 'object',
@@ -36,9 +31,9 @@ const deleteSchema: JSONSchemaType<DeleteSchema> = {
 } as any;
 
 export async function deleteFavouriteTrigger(
-  req: HttpRequest,
-  context: InvocationContext,
-): Promise<HttpResponseInit> {
+  req: functions.HttpRequest,
+  context: functions.InvocationContext,
+): Promise<functions.HttpResponseInit> {
   try {
     const userId = req?.params?.id;
     const store = req?.query?.get('store') || undefined;
@@ -108,7 +103,7 @@ export async function deleteFavouriteTrigger(
   }
 }
 
-app.http('deleteFavourites', {
+functions.app.http('deleteFavourites', {
   methods: ['DELETE'],
   authLevel: 'function',
   handler: deleteFavouriteTrigger,

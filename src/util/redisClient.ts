@@ -1,6 +1,6 @@
-import { RedisSettings } from './types';
-import { getRedisHost, getRedisPort, getRedisPass } from './helpers';
-import Redis from 'ioredis';
+import { RedisSettings } from './types.js';
+import { getRedisHost, getRedisPort, getRedisPass } from './helpers.js';
+import { Redis } from 'ioredis';
 
 let client: Redis;
 

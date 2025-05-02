@@ -1,17 +1,12 @@
 import { JSONSchemaType } from 'ajv';
-import { Cache, GetSchema, Favourite, Favourites } from '../util/types';
-import {
-  app,
-  InvocationContext,
-  HttpRequest,
-  HttpResponseInit,
-} from '@azure/functions';
-import validate from '../util/validator';
-import { createErrorResponse, createResponse } from '../util/responses';
-import { getDataStorage, getFavourites } from '../agent/Agent';
-import filterFavourites from '../util/filterFavourites';
-import getClient from '../util/redisClient';
-import Err from '../util/Err';
+import { Cache, GetSchema, Favourite, Favourites } from '../util/types.js';
+import functions from '@azure/functions';
+import validate from '../util/validator.js';
+import { createErrorResponse, createResponse } from '../util/responses.js';
+import { getDataStorage, getFavourites } from '../agent/Agent.js';
+import filterFavourites from '../util/filterFavourites.js';
+import getClient from '../util/redisClient.js';
+import Err from '../util/Err.js';
 
 const getSchema: JSONSchemaType<GetSchema> = {
   type: 'object',
@@ -28,9 +23,9 @@ const getSchema: JSONSchemaType<GetSchema> = {
 } as any;
 
 export async function getFavouritesTrigger(
-  req: HttpRequest,
-  context: InvocationContext,
-): Promise<HttpResponseInit> {
+  req: functions.HttpRequest,
+  context: functions.InvocationContext,
+): Promise<functions.HttpResponseInit> {
   const userId = req?.params?.id;
   const store = req?.query?.get('store') || undefined;
   const type = req?.query?.get('type') || undefined;
@@ -88,7 +83,7 @@ export async function getFavouritesTrigger(
   }
 }
 
-app.http('getFavourites', {
+functions.app.http('getFavourites', {
   methods: ['GET'],
   authLevel: 'function',
   handler: getFavouritesTrigger,

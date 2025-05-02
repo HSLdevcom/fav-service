@@ -1,4 +1,4 @@
-import { Favourite, Favourites } from '../util/types';
+import { Favourite, Favourites } from '../util/types.js';
 
 const filterFavourites = (
   favourites: Favourites,
