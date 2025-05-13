@@ -66,7 +66,7 @@ describe('deleteFavourites', () => {
     });
     const res = await deleteFavouriteTrigger(request, context);
     expect(res?.status).toEqual(200);
-    expect(res?.jsonBody).toEqual('[]');
+    expect(res?.jsonBody).toEqual([]);
   });
   it(`should fail when param 'id' is not defined`, async () => {
     const request = new functions.HttpRequest({

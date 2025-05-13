@@ -90,10 +90,10 @@ export async function deleteFavouriteTrigger(
     );
     const favourites = await getFavourites(dataStorage.id);
     const filteredFavourites = filterFavourites(favourites, type);
-    const responseBody = JSON.stringify(Object.values(filteredFavourites));
+    const responseBody = Object.values(filteredFavourites);
     return {
       status: deleteSuccessful ? 200 : 400,
-      jsonBody: deleteSuccessful ? responseBody : JSON.stringify(responses),
+      jsonBody: deleteSuccessful ? responseBody : responses,
       headers: {
         'Content-Type': 'application/json',
       },
