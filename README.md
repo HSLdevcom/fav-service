@@ -9,7 +9,7 @@
 
 ### Install dependencies
 
-Install project dependencies using yarn / npm
+Install project dependencies using yarn
 
 ```bash
 yarn
