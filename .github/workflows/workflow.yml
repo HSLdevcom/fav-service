@@ -13,16 +13,16 @@ on:
       - master
 
 env:
-  NODE_VERSION: "20.x"
+  NODE_VERSION: "24.x"
 
 jobs:
   lint:
     runs-on: windows-latest
     steps:
       - name: "Checkout GitHub Action"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: "Resolve Project Dependencies Using Yarn"
@@ -37,9 +37,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: "Checkout GitHub Action"
-        uses: actions/checkout@master
+        uses: actions/checkout@v6
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: "Resolve Project Dependencies Using Yarn"
@@ -59,10 +59,10 @@ jobs:
       - test
     steps:
       - name: "Checkout GitHub Action"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
