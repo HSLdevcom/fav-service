@@ -26,7 +26,11 @@ export default function mergeFavourites(
           existingFav.noteId === favourite.noteId) ||
         (existingFav.postalCode &&
           favourite.postalCode &&
-          existingFav.postalCode === favourite.postalCode)
+          existingFav.postalCode === favourite.postalCode) ||
+        // personalization is a singleton favourite: only one may exist per
+        // user, so any existing one is always treated as a match/update
+        (String(existingFav.type) === 'personalization' &&
+          String(favourite.type) === 'personalization')
       ) {
         duplicate =
           String(existingFav.type) !== 'note' &&

@@ -8,6 +8,7 @@ export enum FavouriteType {
   'bikeStation',
   'note',
   'postalCode',
+  'personalization',
 }
 
 export interface Favourite {
@@ -28,6 +29,9 @@ export interface Favourite {
   stationId?: string;
   expires?: number;
   postalCode?: string;
+  // mode name (e.g. 'bus', 'tram') -> weight multiplier, used by the
+  // singleton 'personalization' favourite only
+  weights?: { [mode: string]: number };
 }
 
 export interface Favourites {

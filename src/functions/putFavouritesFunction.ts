@@ -34,6 +34,7 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
               'bikeStation',
               'note',
               'postalCode',
+              'personalization',
             ],
           },
           lastUpdated: { type: 'number' },
@@ -50,6 +51,10 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
           networks: { type: 'array', items: { type: 'string' } },
           expires: { type: 'number' },
           postalCode: { type: 'string' },
+          weights: {
+            type: 'object',
+            additionalProperties: { type: 'number' },
+          },
         },
         allOf: [
           {
@@ -92,6 +97,14 @@ const updateSchema: JSONSchemaType<UpdateSchema> = {
             },
             then: {
               required: ['type', 'postalCode', 'lastUpdated'],
+            },
+          },
+          {
+            if: {
+              properties: { type: { const: 'personalization' } },
+            },
+            then: {
+              required: ['type', 'lastUpdated', 'weights'],
             },
           },
         ],
