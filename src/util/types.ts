@@ -22,8 +22,8 @@ export interface Favourite {
   address?: string;
   lat?: number;
   lon?: number;
-  selectedIconId?: number;
-  layer?: number;
+  selectedIconId?: string;
+  layer?: string;
   code?: string;
   networks?: Array<string>;
   stationId?: string;
