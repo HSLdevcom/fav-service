@@ -288,3 +288,36 @@ example:
   lastUpdated: 1602161141
 }
 ```
+
+8. Personalization
+
+This is a singleton favourite: at most one may exist per user. It is included in the default
+GET response (no `type` query parameter needed). The service treats any existing
+`personalization` favourite as a match for an incoming `personalization` favourite regardless of
+`favouriteId`, so PUTting a new one always updates the existing one instead of creating a
+duplicate. Clients should still reuse the `favouriteId` they already have, once one has been
+assigned, to avoid relying on this server-side merge behaviour.
+
+```
+{
+  favouriteId: string,	optional (must be in uuid format, the service generates this value if it is not defined)
+  type: "personalization", required
+  weights: object, required (map of lowercase OTP mode name to a weight multiplier, e.g. {"bus": 1.2, "tram": 0.8})
+  lastUpdated: number, required (unix time in seconds when favourite was last updated)
+}
+```
+
+example:
+
+```
+{
+  favouriteId: "171425a1-2aa5-4952-bcfc-5c72e313d086",
+  type: "personalization",
+  weights: {
+    "bus": 1.2,
+    "tram": 0.8,
+    "subway": 1.8
+  },
+  lastUpdated: 1602161141
+}
+```

@@ -901,6 +901,130 @@ describe('putFavourites', () => {
       );
     });
   });
+  describe('put favourite with type personalization', () => {
+    it('should insert favourite succesfully with correct data format', async () => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, mockResponse);
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+
+      const favourite = {
+        weights: { bus: 1.2, tram: 0.8, subway: 1.8 },
+        type: 'personalization',
+        lastUpdated: 1620732626,
+        favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+      };
+
+      const request = new functions.HttpRequest({
+        ...baseRequest,
+        body: { string: JSON.stringify([favourite]) },
+      });
+
+      const res = await putFavouritesTrigger(request, context);
+
+      const body = res?.jsonBody as Favourite[];
+      expect(res?.status).toEqual(200);
+      // personalization is a default-visible type, so the response also
+      // includes the other default-typed favourites already in storage
+      expect(body).toEqual([...Object.values(mockResponse), favourite]);
+    });
+
+    it(`should not insert favourite without 'weights'`, async () => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      const favourite = {
+        type: 'personalization',
+        lastUpdated: 1620732626,
+      };
+
+      const request = new functions.HttpRequest({
+        ...baseRequest,
+        body: { string: JSON.stringify([favourite]) },
+      });
+
+      const res = await putFavouritesTrigger(request, context);
+
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
+        `data/body/0 must have required property 'weights', data/body/0 must match "then" schema`,
+      );
+    });
+
+    it(`should not insert favourite without 'lastUpdated'`, async () => {
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+
+      const favourite = {
+        weights: { bus: 1.2 },
+        type: 'personalization',
+      };
+
+      const request = new functions.HttpRequest({
+        ...baseRequest,
+        body: { string: JSON.stringify([favourite]) },
+      });
+
+      const res = await putFavouritesTrigger(request, context);
+
+      expect(res?.status).toEqual(400);
+      expect(res?.body?.toString()).toEqual(
+        `data/body/0 must have required property 'lastUpdated', data/body/0 must match "then" schema`,
+      );
+    });
+
+    it('should merge a new personalization favourite into the existing one, keeping its favouriteId', async () => {
+      const existing = {
+        'fav-df8170a2-6c20-4267-a1df-05f89d6926bd': {
+          weights: { bus: 1.2 },
+          type: 'personalization',
+          lastUpdated: 1620732626,
+          favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+        },
+      };
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, { ...mockResponse, ...existing });
+      nock('http://localhost')
+        .put('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {});
+
+      const incoming = {
+        weights: { bus: 1.4, tram: 0.9 },
+        type: 'personalization',
+        lastUpdated: 1720732626,
+        favouriteId: 'ffffffff-6c20-4267-a1df-05f89d6926bd',
+      };
+      const request = new functions.HttpRequest({
+        ...baseRequest,
+        body: { string: JSON.stringify([incoming]) },
+      });
+
+      const res = await putFavouritesTrigger(request, context);
+
+      const body = res?.jsonBody as Favourite[];
+      expect(res?.status).toEqual(200);
+      const merged = body.find(fav => fav.type === 'personalization');
+      expect(merged).toEqual({
+        ...incoming,
+        favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+      });
+    });
+  });
   describe('put favourites with new order of favourites', () => {
     beforeEach(() => {
       nock('http://localhost')

@@ -33,6 +33,13 @@ function getClient(): Redis {
       },
       ...redisOptions,
     });
+
+    // Without a listener, an unhandled 'error' event crashes the process
+    // (e.g. during connection blips or Key Vault secret rotation).
+    client.on('error', err => {
+      // eslint-disable-next-line no-console
+      console.error('Redis client error', err);
+    });
   }
   return client;
 }
