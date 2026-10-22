@@ -1,6 +1,7 @@
 import functions from '@azure/functions';
 import nock from 'nock';
 import { getFavouritesTrigger } from '../../src/functions/getFavouritesFunction.ts';
+import getClient from '../../src/util/redisClient.ts';
 import mockResponse from '../../get_mock.json';
 
 const dataStorageNotFoundResponse = {
@@ -126,5 +127,57 @@ describe('getFavourites', () => {
     const body = res?.jsonBody;
     expect(res?.status).toEqual(200);
     expect(body).toEqual([expected]);
+  });
+
+  describe('personalization favourite', () => {
+    const personalization = {
+      favouriteId: 'df8170a2-6c20-4267-a1df-05f89d6926bd',
+      type: 'personalization',
+      weights: { bus: 1.2 },
+      lastUpdated: 1620732626,
+    };
+
+    const getWithQuery = async (query: { [key: string]: string }) => {
+      // the response is cached, so make sure data is read from datastorage
+      await getClient().flushall();
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage')
+        .query({ dsfilter: `ownerId eq "foobar" and name eq "favorites-999"` })
+        .reply(200, dataStorageFoundResponse);
+      nock('http://localhost')
+        .get('/api/rest/v1/datastorage/fafa/data')
+        .reply(200, {
+          ...mockResponse,
+          [personalization.favouriteId]: personalization,
+        });
+      const request = new functions.HttpRequest({
+        method: 'GET',
+        url: 'http://localhost/favorites/foobar',
+        params: { id: 'foobar' },
+        query: { store: 'fav', ...query },
+      });
+      return getFavouritesTrigger(request, context);
+    };
+
+    it('should not be returned without type in query', async () => {
+      const res = await getWithQuery({});
+      expect(res?.status).toEqual(200);
+      expect(res?.jsonBody).toEqual(Object.values(mockResponse));
+    });
+
+    it('should be returned when requested by type', async () => {
+      const res = await getWithQuery({ type: 'personalization' });
+      expect(res?.status).toEqual(200);
+      expect(res?.jsonBody).toEqual([personalization]);
+    });
+
+    it('should be returned together with other requested types', async () => {
+      const res = await getWithQuery({ type: 'route,personalization' });
+      expect(res?.status).toEqual(200);
+      expect(res?.jsonBody).toEqual([
+        Object.values(mockResponse)[0],
+        personalization,
+      ]);
+    });
   });
 });
