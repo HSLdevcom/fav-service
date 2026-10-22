@@ -291,8 +291,10 @@ example:
 
 8. Personalization
 
-This is a singleton favourite: at most one may exist per user. It is included in the default
-GET response (no `type` query parameter needed). The service treats any existing
+This is a singleton favourite: at most one may exist per user. It is not included in the default
+GET response: it can only be fetched by providing type=personalization in request's query
+(https://dev-api.digitransit.fi/favourites/{user's_hsl_id}?type=personalization), alone or
+together with other types, e.g. `type=route,stop,personalization`. The service treats any existing
 `personalization` favourite as a match for an incoming `personalization` favourite regardless of
 `favouriteId`, so PUTting a new one always updates the existing one instead of creating a
 duplicate. Clients should still reuse the `favouriteId` they already have, once one has been

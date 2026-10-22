@@ -9,14 +9,7 @@ const filterFavourites = (
   const responseArray: Array<Favourite> = keys.map((key: string) => {
     return Object(favourites)[key];
   });
-  const defaultTypes = [
-    'route',
-    'stop',
-    'station',
-    'place',
-    'bikeStation',
-    'personalization',
-  ];
+  const defaultTypes = ['route', 'stop', 'station', 'place', 'bikeStation'];
   const filteredArray: Array<Favourite> = responseArray.filter(item => {
     const itemType = String(item.type);
     if (

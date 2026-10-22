@@ -930,9 +930,9 @@ describe('putFavourites', () => {
 
       const body = res?.jsonBody as Favourite[];
       expect(res?.status).toEqual(200);
-      // personalization is a default-visible type, so the response also
-      // includes the other default-typed favourites already in storage
-      expect(body).toEqual([...Object.values(mockResponse), favourite]);
+      // personalization is not returned by default, so the response only
+      // includes the default-typed favourites already in storage
+      expect(body).toEqual(Object.values(mockResponse));
     });
 
     it(`should not insert favourite without 'weights'`, async () => {
@@ -1011,6 +1011,7 @@ describe('putFavourites', () => {
       };
       const request = new functions.HttpRequest({
         ...baseRequest,
+        query: { store: 'fav', type: 'personalization' },
         body: { string: JSON.stringify([incoming]) },
       });
 
